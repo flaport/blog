@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ tag.title() }}</title>
+    <link rel="shortcut icon" type="image/png" href="">
+    <link rel="stylesheet" href="">
+</head>
+<body>
+    <a href="../index.html">Home</a>
+    <h1>{{ tag.title() }}</h1>
+        <hr>
+    {% for post in tag.posts %}
+        <h2><a href="../{{ post.uri() }}">{{ post.title() }}</a></h2>
+        {% for tag_ in post.tags %}
+            {% if tag.uri() != tag_.uri() %}
+                <a href="../{{ tag_.uri() }}">{{ tag_.name() }}</a>&nbsp;
+            {% else %}
+                {{ tag_.name() }}&nbsp;
+            {% endif %}
+        {% endfor %}
+        {{ post.summary() }}
+        <hr>
+    {% endfor %}
+</div>
+</body>
+</html>
+
+
+

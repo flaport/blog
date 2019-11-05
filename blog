@@ -1,0 +1,187 @@
+#!/usr/bin/env python
+
+## Imports
+
+import os
+import re
+import sys
+import glob
+import shutil
+import subprocess
+from pathlib import Path
+from functools import partial, lru_cache
+from typing import Dict, Tuple, List, Callable
+from argparse import ArgumentParser, Namespace
+
+from jinja2 import Template
+
+## Constants
+
+HTMLDIR: Path = Path("html")
+TAGDIR: Path = Path("tags")
+POSTDIR: Path = Path("posts")
+TEMPLATEDIR: Path = Path("templates")
+COMMANDS: Tuple[str, ...] = ("build", "clean", "init")
+
+## Decorators
+cache = partial(lru_cache, None, True)
+
+## Functions
+
+def symbolic_link(src: Path, dest: Path):
+    subprocess.check_output(["ln", "-srf", src, dest])
+
+def get_template(name: str):
+    path = TEMPLATEDIR/name
+    if not os.path.exists(path):
+        return Template("")
+    with open(path, "r") as file:
+        content = file.read()
+    return Template(content)
+
+def md2html(content: str) -> str:
+    mdout = subprocess.Popen(["printf", content], stdout=subprocess.PIPE).stdout
+    html = subprocess.check_output(['pandoc'], stdin=mdout).decode().strip()
+    return html
+
+
+## Classes
+
+class Post:
+    _posts: Dict[Path, 'Post'] = {}
+    _template = get_template("post.html")
+    def __new__(cls, path: Path):
+        if path in cls._posts:
+            return cls._posts[path]
+        return super().__new__(cls)
+    def __init__(self, path: Path):
+        if path in self._posts:
+            return
+        self.path = Path(path)
+        self.tags: List[Tag] = []
+        self._posts[path] = self
+        with open(self.path, "r") as file:
+            self.lines = file.read().split("\n")
+
+    @cache()
+    def render(self):
+        html = self._template.render(post=self)
+        with open(HTMLDIR/self.uri(), "w") as file:
+            print(html, file=file)
+    @cache()
+    def name(self):
+        return str(self.path.relative_to(POSTDIR).stem)
+    @cache()
+    def title(self):
+        title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
+        return title
+    @cache()
+    def summary(self):
+        lines = []
+        for line in self.lines[1:]:
+            if not line.strip():
+                break
+            lines.append(line.strip())
+        return md2html("\n".join(lines))
+    @cache()
+    def content(self):
+        return md2html("\n".join(self.lines[1:]))
+    @cache()
+    def uri(self):
+        return f"{self.name()}.html"
+
+class Tag:
+    _tags: Dict[Path, 'Tag'] = {}
+    _template = get_template("tag.html")
+    def __new__(cls, path: Path):
+        if path in cls._tags:
+            return cls._tags[path]
+        return super().__new__(cls)
+    def __init__(self, path: Path):
+        if path in self._tags:
+            return
+        self.path = Path(path)
+        self.posts: List[Post] = []
+        self._tags[path] = self
+        for post_path in self.path.glob("*"):
+            post = Post(post_path.resolve().relative_to(Path(".").resolve()))
+            self.posts.append(post)
+            post.tags.append(self)
+
+    @cache()
+    def render(self):
+        html = self._template.render(tag=self)
+        with open(HTMLDIR/self.uri(), "w") as file:
+            print(html, file=file)
+    @cache()
+    def name(self):
+        return str(self.path.relative_to(TAGDIR).stem)
+    @cache()
+    def title(self):
+        return self.name().capitalize()
+    @cache()
+    def uri(self):
+        return TAGDIR/f"{self.name()}.html"
+
+class Index:
+    _template = get_template("index.html")
+    def __init__(self):
+        self.posts, self.tags = [], []
+        for post_path in POSTDIR.glob("*.md"):
+            self.posts.append(Post(post_path))
+        for tag_path in TAGDIR.glob("*"):
+            self.tags.append(Tag(tag_path))
+
+    @cache()
+    def render(self):
+        html = self._template.render(index=self)
+        for post in self.posts:
+            post.render()
+        for tag in self.tags:
+            tag.render()
+        with open(HTMLDIR/self.uri(), "w") as file:
+            print(html, file=file)
+    @cache()
+    def name(self):
+        return "index"
+    @cache()
+    def uri(self):
+        return f"{self.name()}.html"
+
+
+## Argument parser
+
+def parse_args(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog: a static blog generator.")
+    parser.add_argument("command", choices=COMMANDS, help="subcommand to execute")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+
+## Commands
+
+def command_build(args: Namespace):
+    command_init(args)
+    index = Index()
+    index.render()
+
+def command_clean(args: Namespace):
+    for directory in (HTMLDIR, HTMLDIR/TAGDIR):
+        shutil.rmtree(directory, ignore_errors=True)
+    command_init(args)
+
+def command_init(args: Namespace):
+    for directory in (HTMLDIR, TAGDIR, POSTDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
+        os.makedirs(directory, exist_ok=True)
+
+## Main
+
+def main(args: List[str]):
+    if Path(".").absolute() != Path(__file__).parents[0].absolute():
+        raise RuntimeError("Run `blog` from the root folder: `./blog`")
+    parsed_args = parse_args(sys.argv[1:])
+    command_func = eval(f"command_{parsed_args.command}")
+    return command_func(parsed_args)
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
