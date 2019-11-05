@@ -42,6 +42,15 @@ def get_template(name: str):
     return Environment(loader=FileSystemLoader(TEMPLATEDIR)).from_string(content)
 
 def md2html(content: str) -> str:
+    # TODO: do this more robustly:
+    parts = content.split("](")
+    for i, part in enumerate(parts[1:], start=1):
+        smallparts = part.split(")")
+        if not smallparts[0].endswith(".md"):
+            continue
+        smallparts[0] = f"{Path(smallparts[0]).stem}.html"
+        parts[i] = ")".join(smallparts)
+    content = "](".join(parts)
     mdout = subprocess.Popen(["printf", content], stdout=subprocess.PIPE).stdout
     html = subprocess.check_output(['pandoc'], stdin=mdout).decode().strip()
     return html
@@ -107,10 +116,12 @@ class Post:
     def summary(self) -> str:
         lines = []
         for line in self.lines[1:]:
-            if not line.strip():
+            line = line.strip()
+            if not line:
                 break
-            lines.append(line.strip())
-        return md2html("\n".join(lines))
+            lines.append(line)
+        html = md2html("\n".join(lines))
+        return html
     @cache()
     def title(self) -> str:
         title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
