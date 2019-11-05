@@ -1,28 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home</title>
-    <link rel="shortcut icon" type="image/png" href="">
-    <link rel="stylesheet" href="">
-</head>
-<body>
-    <a href="index.html">Home</a>
+{% extends "_base.html" %}
+
+{% block content %}
     <h1>Home</h1>
         <hr>
-    {% for post in index.posts %}
-        <h2><a href="{{ post.uri() }}">{{ post.title() }}</a></h2>
-        {% for tag in post.tags %}
-        <a href="{{ tag.uri() }}">{{ tag.name() }}</a>&nbsp;
-        {% endfor %}
-        {{ post.summary() }}
-        <hr>
+    {% for post in page.posts %}
+        {% include "_postsummary.html" %}
     {% endfor %}
-</div>
-</body>
-</html>
-
-
-
+{% endblock content %}

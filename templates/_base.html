@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title() }}</title>
+    <link rel="shortcut icon" type="image/png" href="">
+    <link rel="stylesheet" href="">
+</head>
+<body>
+    <a href="{{ page.uriprefix() }}index.html">Home</a>
+        {% block content %}
+        {% endblock content %}
+<script>
+    document.querySelectorAll(".date").forEach(function(element){
+        var localDate = new Date(element.innerHTML);
+        element.innerHTML = localDate.toDateString();
+    });
+</script>
+</body>
+</html>
+

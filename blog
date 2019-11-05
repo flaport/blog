@@ -7,13 +7,15 @@ import re
 import sys
 import glob
 import shutil
+import hashlib
 import subprocess
 from pathlib import Path
+from datetime import datetime, timedelta
 from functools import partial, lru_cache
 from typing import Dict, Tuple, List, Callable
 from argparse import ArgumentParser, Namespace
 
-from jinja2 import Template
+from jinja2 import Template, Environment, FileSystemLoader
 
 ## Constants
 
@@ -37,7 +39,7 @@ def get_template(name: str):
         return Template("")
     with open(path, "r") as file:
         content = file.read()
-    return Template(content)
+    return Environment(loader=FileSystemLoader(TEMPLATEDIR)).from_string(content)
 
 def md2html(content: str) -> str:
     mdout = subprocess.Popen(["printf", content], stdout=subprocess.PIPE).stdout
@@ -62,21 +64,47 @@ class Post:
         self._posts[path] = self
         with open(self.path, "r") as file:
             self.lines = file.read().split("\n")
-
-    @cache()
     def render(self):
-        html = self._template.render(post=self)
+        html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()
-    def name(self):
+    def author(self) -> str:
+        author = subprocess.check_output(['git', 'log', '--pretty=format:%an%x09', self.path]).decode().split("\n")[0].strip()
+        if not author:
+            author = "Anonymous"
+        return author.lower().capitalize()
+    @cache()
+    def content(self) -> str:
+        return md2html("\n".join(self.lines[1:]))
+    @cache()
+    def id(self) -> str:
+        m = hashlib.md5()
+        m.update(self.summary().encode())
+        return m.hexdigest()[:7]
+    @cache()
+    def name(self) -> str:
         return str(self.path.relative_to(POSTDIR).stem)
     @cache()
-    def title(self):
-        title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
-        return title
+    def uri(self) -> str:
+        return f"{self.name()}.html"
     @cache()
-    def summary(self):
+    def uriprefix(self) -> str:
+        return "./"
+    @cache()
+    def utcpublished(self) -> datetime:
+        datetimestr = subprocess.check_output(['git', 'log', '--diff-filter=A', '--follow', '--format=%aD', '--max-count=1', '--', self.path]).decode().strip()
+        localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
+        utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+        return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+    @cache()
+    def utcmodified(self) -> datetime:
+        datetimestr = subprocess.check_output(["git", "log", "-1", '--format="%aD"', "--", self.path]).decode().strip()
+        localdatetime = datetime.strptime(datetimestr, "\"%a, %d %b %Y %H:%M:%S %z\"")
+        utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+        return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+    @cache()
+    def summary(self) -> str:
         lines = []
         for line in self.lines[1:]:
             if not line.strip():
@@ -84,11 +112,9 @@ class Post:
             lines.append(line.strip())
         return md2html("\n".join(lines))
     @cache()
-    def content(self):
-        return md2html("\n".join(self.lines[1:]))
-    @cache()
-    def uri(self):
-        return f"{self.name()}.html"
+    def title(self) -> str:
+        title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
+        return title
 
 class Tag:
     _tags: Dict[Path, 'Tag'] = {}
@@ -107,34 +133,33 @@ class Tag:
             post = Post(post_path.resolve().relative_to(Path(".").resolve()))
             self.posts.append(post)
             post.tags.append(self)
-
-    @cache()
     def render(self):
-        html = self._template.render(tag=self)
+        html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()
-    def name(self):
+    def name(self) -> str:
         return str(self.path.relative_to(TAGDIR).stem)
     @cache()
-    def title(self):
-        return self.name().capitalize()
+    def uri(self) -> str:
+        return str(TAGDIR/f"{self.name()}.html")
     @cache()
-    def uri(self):
-        return TAGDIR/f"{self.name()}.html"
+    def uriprefix(self) -> str:
+        return "../"
+    @cache()
+    def title(self) -> str:
+        return self.name().capitalize()
 
 class Index:
     _template = get_template("index.html")
     def __init__(self):
         self.posts, self.tags = [], []
-        for post_path in POSTDIR.glob("*.md"):
+        for post_path in POSTDIR.glob("*"):
             self.posts.append(Post(post_path))
         for tag_path in TAGDIR.glob("*"):
             self.tags.append(Tag(tag_path))
-
-    @cache()
     def render(self):
-        html = self._template.render(index=self)
+        html = self._template.render(page=self)
         for post in self.posts:
             post.render()
         for tag in self.tags:
@@ -142,11 +167,17 @@ class Index:
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()
-    def name(self):
+    def name(self) -> str:
         return "index"
     @cache()
-    def uri(self):
+    def title(self) -> str:
+        return self.name().capitalize()
+    @cache()
+    def uri(self) -> str:
         return f"{self.name()}.html"
+    @cache()
+    def uriprefix(self) -> str:
+        return "./"
 
 
 ## Argument parser
