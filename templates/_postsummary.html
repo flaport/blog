@@ -1,11 +1,13 @@
 <h2><a href="{{ page.uriprefix() }}{{ post.uri() }}">{{ post.title() }}</a></h2>
 <p>
-author: {{ post.author() }}&nbsp;&middot;
-published: <a class="date">{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+author: {{ post.author() }}
+&middot;&nbsp;published: <a class="date">{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% if post.utcmodified().strftime("%Y-%m-%d") != post.utcpublished().strftime("%Y-%m-%d") %}
-last modified: <a class="date">{{ post.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+&middot;&nbsp;last modified: <a class="date">{{ post.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% endif %}
-tags:
+{% if post.tags %}
+&middot;&nbsp;tags:
+{% endif %}
 {% for tag in post.tags %}
     {% if page.uri() != tag.uri() %}
         <a href="{{ page.uriprefix() }}{{ tag.uri() }}">{{ tag.name() }}</a>&nbsp;

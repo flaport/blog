@@ -3,9 +3,11 @@
 ## Imports
 
 import os
+import io
 import re
 import sys
 import glob
+import json
 import shutil
 import hashlib
 import subprocess
@@ -17,11 +19,13 @@ from argparse import ArgumentParser, Namespace
 
 from jinja2 import Template, Environment, FileSystemLoader
 
+
 ## Constants
 
 HTMLDIR: Path = Path("html")
 TAGDIR: Path = Path("tags")
 POSTDIR: Path = Path("posts")
+STATICDIR: Path = Path("static")
 TEMPLATEDIR: Path = Path("templates")
 COMMANDS: Tuple[str, ...] = ("build", "clean", "init")
 
@@ -55,6 +59,19 @@ def md2html(content: str) -> str:
     html = subprocess.check_output(['pandoc'], stdin=mdout).decode().strip()
     return html
 
+def ipynb2html(content: str) -> str:
+    from nbconvert.nbconvertapp import NbConvertApp
+    from nbconvert.exporters.html import HTMLExporter
+    app = NbConvertApp.instance()
+    app.initialize(["--template=basic"])
+    app.exporter = HTMLExporter(config=app.config)
+    html, _ = app.export_single_notebook(
+        notebook_filename=None,
+        resources=None,
+        input_buffer=io.StringIO(content)
+    )
+    return html
+
 
 ## Classes
 
@@ -71,8 +88,11 @@ class Post:
         self.path = Path(path)
         self.tags: List[Tag] = []
         self._posts[path] = self
+        self.lines = self.readlines()
+    def readlines(self):
         with open(self.path, "r") as file:
-            self.lines = file.read().split("\n")
+            lines = file.read().split("\n")
+        return lines
     def render(self):
         html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
@@ -127,6 +147,46 @@ class Post:
         title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
         return title
 
+class NotebookPost(Post):
+    def __init__(self, path: Path):
+        super().__init__(path)
+        self.json = self.readjson()
+        self.lines = self.readlines()
+
+    def readjson(self):
+        with open(self.path, "r") as file:
+            dic = json.load(file)
+        return dic
+
+    def readlines(self):
+        if not hasattr(self, "json"):
+            return []
+        with open(self.path, "r") as file:
+            lines = "".join(self.json["cells"][0]["source"]).split("\n")
+        return lines
+
+    @cache()
+    def content(self) -> str:
+        return ipynb2html(json.dumps(self.json))
+
+class MarkdownPost(NotebookPost):
+    def readjson(self):
+        with open(self.path, "r") as file:
+            dic = {
+                "cells": [
+                    {
+                       "cell_type": "markdown",
+                       "metadata": {},
+                        "source" : file.readlines(),
+                    }
+                ],
+                 "metadata": {},
+                 "nbformat": 4,
+                 "nbformat_minor": 4
+            }
+        return dic
+
+
 class Tag:
     _tags: Dict[Path, 'Tag'] = {}
     _template = get_template("tag.html")
@@ -141,7 +201,15 @@ class Tag:
         self.posts: List[Post] = []
         self._tags[path] = self
         for post_path in self.path.glob("*"):
-            post = Post(post_path.resolve().relative_to(Path(".").resolve()))
+            post_path = post_path.resolve().relative_to(Path(".").resolve())
+            if post_path.is_dir():
+                continue
+            elif post_path.suffix == ".md":
+                post = MarkdownPost(post_path)
+            elif post_path.suffix == ".ipynb":
+                post = NotebookPost(post_path)
+            else:
+                continue
             self.posts.append(post)
             post.tags.append(self)
     def render(self):
@@ -166,7 +234,15 @@ class Index:
     def __init__(self):
         self.posts, self.tags = [], []
         for post_path in POSTDIR.glob("*"):
-            self.posts.append(Post(post_path))
+            if post_path.is_dir():
+                continue
+            elif post_path.suffix == ".md":
+                post = MarkdownPost(post_path)
+            elif post_path.suffix == ".ipynb":
+                post = NotebookPost(post_path)
+            else:
+                continue
+            self.posts.append(MarkdownPost(post_path))
         for tag_path in TAGDIR.glob("*"):
             self.tags.append(Tag(tag_path))
     def render(self):
@@ -213,8 +289,10 @@ def command_clean(args: Namespace):
     command_init(args)
 
 def command_init(args: Namespace):
-    for directory in (HTMLDIR, TAGDIR, POSTDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
+    for directory in (HTMLDIR, TAGDIR, POSTDIR, STATICDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
         os.makedirs(directory, exist_ok=True)
+    symbolic_link(STATICDIR, HTMLDIR)
+    symbolic_link(STATICDIR, POSTDIR)
 
 ## Main
 
