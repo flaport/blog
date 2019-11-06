@@ -212,6 +212,8 @@ class Tag:
                 continue
             self.posts.append(post)
             post.tags.append(self)
+        post.tags = sorted(post.tags, key=lambda x: x.name())
+        self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self):
         html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
@@ -245,6 +247,8 @@ class Index:
             self.posts.append(MarkdownPost(post_path))
         for tag_path in TAGDIR.glob("*"):
             self.tags.append(Tag(tag_path))
+        self.tags = sorted(self.tags, key=lambda x: x.name())
+        self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self):
         html = self._template.render(page=self)
         for post in self.posts:
