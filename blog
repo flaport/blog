@@ -89,14 +89,14 @@ class Post:
         self.tags: List[Tag] = []
         self._posts[path] = self
         self.lines = self.readlines()
-    def readlines(self):
-        with open(self.path, "r") as file:
-            lines = file.read().split("\n")
-        return lines
     def render(self):
         html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
+    def readlines(self):
+        with open(self.path, "r") as file:
+            lines = file.read().split("\n")
+        return lines
     @cache()
     def author(self) -> str:
         author = subprocess.check_output(['git', 'log', '--pretty=format:%an%x09', self.path]).decode().split("\n")[0].strip()
@@ -152,19 +152,25 @@ class NotebookPost(Post):
         super().__init__(path)
         self.json = self.readjson()
         self.lines = self.readlines()
-
     def readjson(self):
         with open(self.path, "r") as file:
             dic = json.load(file)
         return dic
-
     def readlines(self):
         if not hasattr(self, "json"):
             return []
         with open(self.path, "r") as file:
-            lines = "".join(self.json["cells"][0]["source"]).split("\n")
-        return lines
-
+            lines = self.json["cells"][0]["source"]
+        # remove title.
+        while not lines[0].strip():
+            lines = lines[1:]
+        title = lines[0]
+        while title[0] == " ":
+            title = title[1:]
+        if not title.startswith("# "):
+            raise RuntimeError(f"could not find title for post '{self.name()}'")
+        self.json["cells"][0]["source"] = lines[1:]
+        return "".join(lines).split("\n")
     @cache()
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
@@ -172,18 +178,19 @@ class NotebookPost(Post):
 class MarkdownPost(NotebookPost):
     def readjson(self):
         with open(self.path, "r") as file:
-            dic = {
-                "cells": [
-                    {
-                       "cell_type": "markdown",
-                       "metadata": {},
-                        "source" : file.readlines(),
-                    }
-                ],
-                 "metadata": {},
-                 "nbformat": 4,
-                 "nbformat_minor": 4
-            }
+            lines = file.readlines()
+        dic = {
+            "cells": [
+                {
+                   "cell_type": "markdown",
+                   "metadata": {},
+                    "source" : lines,
+                }
+            ],
+             "metadata": {},
+             "nbformat": 4,
+             "nbformat_minor": 4
+        }
         return dic
 
 
