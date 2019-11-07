@@ -161,7 +161,7 @@ class NotebookPost(Post):
         super().__init__(path)
         self.json = self.readjson()
         self._replace_raw_cell_by_markdown_cell(self.json)
-        self.interactive_plots = self._patch_interactive_plots_in_json(self.json)
+        self.interactive_plots = self._patch_json_for_plotly(self.json)
         self.lines = self.readlines()
     def readjson(self) -> Dict:
         with open(self.path, "r") as file:
@@ -174,18 +174,13 @@ class NotebookPost(Post):
                 cell['cell_type'] = 'markdown'
                 cell['source'] = ['\n```\n',*cell['source'],'\n```\n']
     @staticmethod
-    def _patch_interactive_plots_in_json(dic: Dict) -> Dict[str, str]:
-        vega = ('<div id="vis{id}"></div>\n'
-                '<script type="text/javascript">\n'
-                'var spec = {spec}\n'
-                'vegaEmbed("#vis{id}", spec, {{"actions":false}});\n'
-                '</script>')
-        plotly = ('<div id="{id}" class="plotly-graph-div"></div>\n'
-                  '<script type="text/javascript">\n'
-                  'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
-                  'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
-                  'var spec = {spec}\n'
-                  'Plotly.newPlot("{id}", spec, {{}}, {{"showLink": false, "linkText": ""}})</script>\n')
+    def _patch_json_for_plotly(dic: Dict) -> Dict[str, str]:
+        template = ('<div id="{id}" class="plotly-graph-div"></div>\n'
+                    '<script type="text/javascript">\n'
+                    'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
+                    'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
+                    'var spec = {spec}\n'
+                    'Plotly.newPlot("{id}", spec, {{}}, {{"showLink": false, "linkText": ""}})</script>\n')
         interactive_plots = {}
         for i, cell in enumerate(dic['cells']):
             outputs = cell.get('outputs')
@@ -195,22 +190,17 @@ class NotebookPost(Post):
                 data = output.get('data')
                 if not data:
                     continue
-                keys = [k for k in data if ('vega' in k or 'plotly' in k)]
+                keys = [k for k in data if 'plotly' in k]
                 if not keys:
                     continue
-                del data['image/png']
                 data['text/plain'] = ''
                 for key in keys:
                     id = secrets.token_hex(8)
-                    spec = json.dumps(data[key])
                     data['text/plain'] = data['text/plain'] + "{{ %s }}\n"%id
-                    if 'vega' in key:
-                        interactive_plots['{{ %s }}'%id] = vega.format(id=id, spec=spec)
-                    elif 'plotly' in key:
-                        interactive_plots['{{ %s }}'%id] = plotly.format(id=id, spec=spec)
+                    interactive_plots['{{ %s }}'%id] = template.format(id=id, spec=json.dumps(data[key]))
         return interactive_plots
     @staticmethod
-    def _patch_interactive_plots_in_html(html: str, plots: Dict[str, str]) -> str:
+    def _patch_html_for_plotly(html: str, plots: Dict[str, str]) -> str:
         # update html with saved key value pairs
         for k, v in plots.items():
             html = html.replace(k,v)
@@ -222,6 +212,13 @@ class NotebookPost(Post):
             idx2 = html.find(r'</script>', idx1)
             html = html[:idx1] + r"};" + html[idx2:]
             idx = html.find(r'require(["plotly"], function(Plotly) {', idx2)
+        html = html.replace('"paper_bgcolor": "white"', '"paper_bgcolor": "#00000000"')
+        html = re.sub('"font": {"color": "#......"}', '"font": {"color": "#999999"}', html)
+        return html
+    @staticmethod
+    def _patch_html_for_vega(html: str) -> str:
+        html = html.replace('"mode": "vega-lite"', '"mode": "vega-lite", "actions": false')
+        html = re.sub('"view": {([^}]*)}', r'"view": {\1}, "background": "#00000000"', html)
         return html
 
     def readlines(self) -> List[str]:
@@ -244,7 +241,8 @@ class NotebookPost(Post):
         return ipynb2html(json.dumps(self.json))
     def render(self):
         html = self._template.render(page=self)
-        html = self._patch_interactive_plots_in_html(html, self.interactive_plots)
+        html = self._patch_html_for_plotly(html, self.interactive_plots)
+        html = self._patch_html_for_vega(html)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
 

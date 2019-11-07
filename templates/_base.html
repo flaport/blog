@@ -18,15 +18,12 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-    <a href="{{ page.uriprefix() }}index.html">Home</a>
+    <a href="/">Home</a>
+    <input type="checkbox" id="darkmodetoggle" />darkmode
         {% block content %}
         {% endblock content %}
-<script>
-    document.querySelectorAll(".date").forEach(function(element){
-        var localDate = new Date(element.innerHTML);
-        element.innerHTML = localDate.toDateString();
-    });
-</script>
+<script src="/static/js/localdates.js"></script>
+<script src="/static/js/toggledarkmode.js"></script>
 </body>
 </html>
 
