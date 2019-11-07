@@ -28,6 +28,10 @@ POSTDIR: Path = Path("posts")
 STATICDIR: Path = Path("static")
 TEMPLATEDIR: Path = Path("templates")
 COMMANDS: Tuple[str, ...] = ("build", "clean", "init")
+EXTS: Dict[str, str] = {
+    ".md": "MarkdownPost",
+    ".ipynb": "NotebookPost",
+}
 
 ## Decorators
 cache = partial(lru_cache, None, True)
@@ -45,23 +49,28 @@ def get_template(name: str):
         content = file.read()
     return Environment(loader=FileSystemLoader(TEMPLATEDIR)).from_string(content)
 
-def md2html(content: str) -> str:
+def replace_markdown_links(content: str) -> str:
     # TODO: do this more robustly:
     parts = content.split("](")
     for i, part in enumerate(parts[1:], start=1):
         smallparts = part.split(")")
-        if not smallparts[0].endswith(".md"):
+        if smallparts[0].startswith("http://") or smallparts[0].startswith("https://"):
             continue
         smallparts[0] = f"{Path(smallparts[0]).stem}.html"
         parts[i] = ")".join(smallparts)
     content = "](".join(parts)
+    return content
+
+def md2html(content: str) -> str:
+    content = replace_markdown_links(content)
     mdout = subprocess.Popen(["printf", content], stdout=subprocess.PIPE).stdout
     html = subprocess.check_output(['pandoc'], stdin=mdout).decode().strip()
     return html
 
 def ipynb2html(content: str) -> str:
-    from nbconvert.nbconvertapp import NbConvertApp
-    from nbconvert.exporters.html import HTMLExporter
+    from nbconvert.nbconvertapp import NbConvertApp # type: ignore
+    from nbconvert.exporters.html import HTMLExporter # type: ignore
+    content = replace_markdown_links(content)
     app = NbConvertApp.instance()
     app.initialize(["--template=basic"])
     app.exporter = HTMLExporter(config=app.config)
@@ -124,13 +133,17 @@ class Post:
     def utcpublished(self) -> datetime:
         datetimestr = subprocess.check_output(['git', 'log', '--diff-filter=A', '--follow', '--format=%aD', '--max-count=1', '--', self.path]).decode().strip()
         localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
+        assert localdatetime.tzinfo is not None
         utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+        assert utcoffset is not None
         return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
     @cache()
     def utcmodified(self) -> datetime:
-        datetimestr = subprocess.check_output(["git", "log", "-1", '--format="%aD"', "--", self.path]).decode().strip()
-        localdatetime = datetime.strptime(datetimestr, "\"%a, %d %b %Y %H:%M:%S %z\"")
+        datetimestr = subprocess.check_output(["git", "log", "-1", '--format=%aD', "--", self.path]).decode().strip()
+        localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
+        assert localdatetime.tzinfo is not None
         utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+        assert utcoffset is not None
         return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
     @cache()
     def summary(self) -> str:
@@ -211,12 +224,11 @@ class Tag:
             post_path = post_path.resolve().relative_to(Path(".").resolve())
             if post_path.is_dir():
                 continue
-            elif post_path.suffix == ".md":
-                post = MarkdownPost(post_path)
-            elif post_path.suffix == ".ipynb":
-                post = NotebookPost(post_path)
-            else:
+            clsname = EXTS.get(post_path.suffix, None)
+            if clsname is None:
                 continue
+            cls = eval(clsname)
+            post: Post = cls(post_path)
             self.posts.append(post)
             post.tags.append(self)
         post.tags = sorted(post.tags, key=lambda x: x.name())
@@ -245,13 +257,12 @@ class Index:
         for post_path in POSTDIR.glob("*"):
             if post_path.is_dir():
                 continue
-            elif post_path.suffix == ".md":
-                post = MarkdownPost(post_path)
-            elif post_path.suffix == ".ipynb":
-                post = NotebookPost(post_path)
-            else:
+            clsname = EXTS.get(post_path.suffix, None)
+            if clsname is None:
                 continue
-            self.posts.append(MarkdownPost(post_path))
+            cls = eval(clsname)
+            post: Post = cls(post_path)
+            self.posts.append(post)
         for tag_path in TAGDIR.glob("*"):
             self.tags.append(Tag(tag_path))
         self.tags = sorted(self.tags, key=lambda x: x.name())
