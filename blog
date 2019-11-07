@@ -9,7 +9,7 @@ import sys
 import glob
 import json
 import shutil
-import hashlib
+import secrets
 import subprocess
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -41,20 +41,21 @@ cache = partial(lru_cache, None, True)
 def symbolic_link(src: Path, dest: Path):
     subprocess.check_output(["ln", "-srf", src, dest])
 
-def get_template(name: str):
+def get_template(name: str) -> Template:
     path = TEMPLATEDIR/name
     if not os.path.exists(path):
         return Template("")
     with open(path, "r") as file:
         content = file.read()
-    return Environment(loader=FileSystemLoader(TEMPLATEDIR)).from_string(content)
+    template = Environment(loader=FileSystemLoader(TEMPLATEDIR)).from_string(content)
+    return template
 
 def replace_markdown_links(content: str) -> str:
     # TODO: do this more robustly:
     parts = content.split("](")
     for i, part in enumerate(parts[1:], start=1):
         smallparts = part.split(")")
-        if smallparts[0].startswith("http://") or smallparts[0].startswith("https://"):
+        if smallparts[0].startswith("http://") or smallparts[0].startswith("https://") or smallparts[0].startswith("static"):
             continue
         smallparts[0] = f"{Path(smallparts[0]).stem}.html"
         parts[i] = ")".join(smallparts)
@@ -102,7 +103,7 @@ class Post:
         html = self._template.render(page=self)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
-    def readlines(self):
+    def readlines(self) -> List[str]:
         with open(self.path, "r") as file:
             lines = file.read().split("\n")
         return lines
@@ -115,11 +116,6 @@ class Post:
     @cache()
     def content(self) -> str:
         return md2html("\n".join(self.lines[1:]))
-    @cache()
-    def id(self) -> str:
-        m = hashlib.md5()
-        m.update(self.summary().encode())
-        return m.hexdigest()[:7]
     @cache()
     def name(self) -> str:
         return str(self.path.relative_to(POSTDIR).stem)
@@ -164,12 +160,71 @@ class NotebookPost(Post):
     def __init__(self, path: Path):
         super().__init__(path)
         self.json = self.readjson()
+        self._replace_raw_cell_by_markdown_cell(self.json)
+        self.interactive_plots = self._patch_interactive_plots_in_json(self.json)
         self.lines = self.readlines()
-    def readjson(self):
+    def readjson(self) -> Dict:
         with open(self.path, "r") as file:
             dic = json.load(file)
         return dic
-    def readlines(self):
+    @staticmethod
+    def _replace_raw_cell_by_markdown_cell(dic: Dict):
+        for cell in dic['cells']:
+            if cell['cell_type'] == 'raw':
+                cell['cell_type'] = 'markdown'
+                cell['source'] = ['\n```\n',*cell['source'],'\n```\n']
+    @staticmethod
+    def _patch_interactive_plots_in_json(dic: Dict) -> Dict[str, str]:
+        vega = ('<div id="vis{id}"></div>\n'
+                '<script type="text/javascript">\n'
+                'var spec = {spec}\n'
+                'vegaEmbed("#vis{id}", spec, {{"actions":false}});\n'
+                '</script>')
+        plotly = ('<div id="{id}" class="plotly-graph-div"></div>\n'
+                  '<script type="text/javascript">\n'
+                  'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
+                  'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
+                  'var spec = {spec}\n'
+                  'Plotly.newPlot("{id}", spec, {{}}, {{"showLink": false, "linkText": ""}})</script>\n')
+        interactive_plots = {}
+        for i, cell in enumerate(dic['cells']):
+            outputs = cell.get('outputs')
+            if not outputs:
+                continue
+            for output in outputs:
+                data = output.get('data')
+                if not data:
+                    continue
+                keys = [k for k in data if ('vega' in k or 'plotly' in k)]
+                if not keys:
+                    continue
+                del data['image/png']
+                data['text/plain'] = ''
+                for key in keys:
+                    id = secrets.token_hex(8)
+                    spec = json.dumps(data[key])
+                    data['text/plain'] = data['text/plain'] + "{{ %s }}\n"%id
+                    if 'vega' in key:
+                        interactive_plots['{{ %s }}'%id] = vega.format(id=id, spec=spec)
+                    elif 'plotly' in key:
+                        interactive_plots['{{ %s }}'%id] = plotly.format(id=id, spec=spec)
+        return interactive_plots
+    @staticmethod
+    def _patch_interactive_plots_in_html(html: str, plots: Dict[str, str]) -> str:
+        # update html with saved key value pairs
+        for k, v in plots.items():
+            html = html.replace(k,v)
+        # patch plotly plot (i know... quite terrible hack)
+        idx = html.find(r'require(["plotly"], function(Plotly) {')
+        while idx > 0:
+            html = html.replace(r'require(["plotly"], function(Plotly) {', '', 1)
+            idx1 = html.find(r'.then(function()', idx)
+            idx2 = html.find(r'</script>', idx1)
+            html = html[:idx1] + r"};" + html[idx2:]
+            idx = html.find(r'require(["plotly"], function(Plotly) {', idx2)
+        return html
+
+    def readlines(self) -> List[str]:
         if not hasattr(self, "json"):
             return []
         with open(self.path, "r") as file:
@@ -187,9 +242,14 @@ class NotebookPost(Post):
     @cache()
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
+    def render(self):
+        html = self._template.render(page=self)
+        html = self._patch_interactive_plots_in_html(html, self.interactive_plots)
+        with open(HTMLDIR/self.uri(), "w") as file:
+            print(html, file=file)
 
 class MarkdownPost(NotebookPost):
-    def readjson(self):
+    def readjson(self) -> Dict:
         with open(self.path, "r") as file:
             lines = file.readlines()
         dic = {
@@ -264,14 +324,18 @@ class Index:
             post: Post = cls(post_path)
             self.posts.append(post)
         for tag_path in TAGDIR.glob("*"):
+            if not tag_path.is_dir():
+                continue
             self.tags.append(Tag(tag_path))
         self.tags = sorted(self.tags, key=lambda x: x.name())
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self):
         html = self._template.render(page=self)
         for post in self.posts:
+            print(post.name())
             post.render()
         for tag in self.tags:
+            print(tag.name())
             tag.render()
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)

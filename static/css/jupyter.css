@@ -40,6 +40,9 @@ pre {
 .prompt.input_prompt {
   display: none;
 }
+.prompt.output_prompt {
+  display: none;
+}
 a.anchor-link {
   color: #00000000;
   text-decoration: none;
