@@ -1,0 +1,40 @@
+pre {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 0px;
+  padding-left: 10pt;
+  padding-right: 10pt;
+  padding-top: 5pt;
+  padding-bottom: 5pt;
+}
+.input{
+  padding-left: 0pt;
+  padding-right: 0pt;
+  padding-top: 0pt;
+  padding-bottom: 0pt;
+}
+.output_wrapper{
+  padding-left: 0pt;
+  padding-right: 0pt;
+  padding-top: 0pt;
+  padding-bottom: 0pt;
+}
+.output {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 0px;
+  padding-left: 10pt;
+  padding-right: 10pt;
+  padding-top: 5pt;
+  padding-bottom: 5pt;
+}
+.prompt.input_prompt {
+  display: none;
+}
+.prompt.output_prompt {
+  display: none;
+}
+a.anchor-link {
+  color: #00000000;
+  text-decoration: none;
+}
