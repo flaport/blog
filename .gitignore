@@ -4,6 +4,7 @@ __pycache__/
 .ipynb_checkpoints/
 .mypy_cache/
 
+.tags
 *.egg-info
 *.pyc
 *.log

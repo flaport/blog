@@ -1,0 +1,45 @@
+@font-face {
+    font-family: 'Sans';
+    src: url('/static/fonts/LinBiolinum_Rah.ttf');
+}
+@font-face {
+    font-family: 'SansBold';
+    src: url('/static/fonts/LinBiolinum_RBah.ttf');
+}
+@font-face {
+    font-family: 'SansItalic';
+    src: url('/static/fonts/LinBiolinum_RIah.ttf');
+}
+@font-face {
+    font-family: 'Mono';
+    src: url('/static/fonts/FiraCode-Regular.ttf');
+}
+@font-face {
+    font-family: 'MonoBold';
+    src: url('/static/fonts/FiraCode-SemiBold.ttf');
+}
+@font-face {
+    font-family: 'MonoItalic';
+    src: url('/static/fonts/FiraCode-Light.ttf');
+}
+body {
+    font-family: Sans;
+    font-size: 1.1em;
+    background-color:#ffffff;
+    line-height: 1.1;
+}
+a {
+    text-decoration: none;
+}
+b, strong {
+    font-family: SansBold;
+    font-weight: normal;
+}
+i {
+    font-family: SansItalic;
+}
+code, kbd, samp, pre {
+    font-family: Mono;
+    font-size: 0.8em;
+    line-height: 1.0;
+}

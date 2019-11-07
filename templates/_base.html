@@ -6,24 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ page.title() }}</title>
     <link rel="shortcut icon" type="image/png" href="">
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/fonts.css">
     <link rel="stylesheet" href="/static/css/jupyter.css">
-    <style>
-        @font-face {
-            font-family: 'BiolinumRegular';
-            src: url('/static/fonts/LinBiolinum_Rah.ttf')
-        }
-        @font-face {
-            font-family: 'BiolinumBold';
-            src: url('/static/fonts/LinBiolinum_RBah.ttf')
-        }
-        @font-face {
-            font-family: 'BiolinumItalic';
-            src: url('/static/fonts/LinBiolinum_RIah.ttf')
-        }
-        body {
-            font-family: BiolinumRegular;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
     <a href="{{ page.uriprefix() }}index.html">Home</a>
