@@ -10,7 +10,7 @@
     {% endif %}
     tags:
     {% for tag in page.tags %}
-        <a href="{{ page.uriprefix() }}{{ tag.uri() }}">{{ tag.name() }}</a>&nbsp;
+        <a href="/{{ tag.uri() }}">{{ tag.name() }}</a>&nbsp;
     {% endfor %}
     </p>
     {{ page.content() }}

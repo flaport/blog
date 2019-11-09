@@ -57,7 +57,7 @@ def replace_markdown_links(content: str) -> str:
         smallparts = part.split(")")
         if smallparts[0].startswith("http://") or smallparts[0].startswith("https://") or smallparts[0].startswith("static"):
             continue
-        smallparts[0] = f"{Path(smallparts[0]).stem}.html"
+        smallparts[0] = f"/{Path(smallparts[0]).stem}.html"
         parts[i] = ")".join(smallparts)
     content = "](".join(parts)
     return content
@@ -122,9 +122,6 @@ class Post:
     @cache()
     def uri(self) -> str:
         return f"{self.name()}.html"
-    @cache()
-    def uriprefix(self) -> str:
-        return "./"
     @cache()
     def utcpublished(self) -> datetime:
         datetimestr = subprocess.check_output(['git', 'log', '--diff-filter=A', '--follow', '--format=%aD', '--max-count=1', '--', self.path]).decode().strip()
@@ -302,9 +299,6 @@ class Tag:
     def uri(self) -> str:
         return str(TAGDIR/f"{self.name()}.html")
     @cache()
-    def uriprefix(self) -> str:
-        return "../"
-    @cache()
     def title(self) -> str:
         return self.name().capitalize()
 
@@ -346,9 +340,6 @@ class Index:
     @cache()
     def uri(self) -> str:
         return f"{self.name()}.html"
-    @cache()
-    def uriprefix(self) -> str:
-        return "./"
 
 
 ## Argument parser
