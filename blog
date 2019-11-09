@@ -10,7 +10,10 @@ import glob
 import json
 import shutil
 import secrets
+import threading
 import subprocess
+import http.server
+import socketserver
 from pathlib import Path
 from datetime import datetime, timedelta
 from functools import partial, lru_cache
@@ -27,7 +30,7 @@ TAGDIR: Path = Path("tags")
 POSTDIR: Path = Path("posts")
 STATICDIR: Path = Path("static")
 TEMPLATEDIR: Path = Path("templates")
-COMMANDS: Tuple[str, ...] = ("build", "clean", "init")
+COMMANDS: Tuple[str, ...] = ("build", "clean", "init", "serve")
 EXTS: Dict[str, str] = {
     ".md": "MarkdownPost",
     ".ipynb": "NotebookPost",
@@ -342,11 +345,41 @@ class Index:
         return f"{self.name()}.html"
 
 
-## Argument parser
+## Argument parsers
 
 def parse_args(args: List[str]) -> Namespace:
+    main_args = parse_command(args[:1])
+    parse_flags = eval(f"parse_{main_args.command}")
+    sub_args = parse_flags(args[1:])
+    parsed_args = Namespace(**main_args.__dict__, **sub_args.__dict__)
+    parsed_args.orig_args = args
+    return parsed_args
+
+def parse_command(args: List[str]) -> Namespace:
     parser = ArgumentParser(description="blog: a static blog generator.")
-    parser.add_argument("command", choices=COMMANDS, help="subcommand to execute")
+    parser.add_argument("command", choices=COMMANDS, help="command to execute")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+def parse_build(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog-build: build the blog.")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+def parse_clean(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog-clean: remove the exported html.")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+def parse_init(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog-init: initialize the blog.")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+def parse_serve(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog-serve: serve your static blog locally")
+    parser.add_argument("-p", "--port", default=8787, type=int, help="(default: 8787) port to locally serve the development website")
+    parser.add_argument("-b", "--no-fork", action="store_true", default=False, help="prevent forking of the server")
     parsed_args = parser.parse_args(args)
     return parsed_args
 
@@ -369,14 +402,26 @@ def command_init(args: Namespace):
     symbolic_link(STATICDIR, HTMLDIR)
     symbolic_link(STATICDIR, POSTDIR)
 
+def command_serve(args: Namespace):
+    if not args.no_fork:
+        newargs = ["python", __file__, *args.orig_args, "--no-fork"]
+        with open(os.devnull, "w") as file:
+            process = subprocess.Popen(newargs, stdout=file, stderr=file)
+        print(f"serving at port {args.port} with pid {process.pid}")
+        return
+    print(f"serving at port {args.port}")
+    os.chdir(HTMLDIR)
+    httpd = socketserver.TCPServer(("", args.port), http.server.SimpleHTTPRequestHandler)
+    httpd.serve_forever()
+
 ## Main
 
 def main(args: List[str]):
     if Path(".").absolute() != Path(__file__).parents[0].absolute():
         raise RuntimeError("Run `blog` from the root folder: `./blog`")
     parsed_args = parse_args(sys.argv[1:])
-    command_func = eval(f"command_{parsed_args.command}")
-    return command_func(parsed_args)
+    command = eval(f"command_{parsed_args.command}")
+    return command(parsed_args)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
