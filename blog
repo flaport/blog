@@ -30,7 +30,7 @@ TAGDIR: Path = Path("tags")
 POSTDIR: Path = Path("posts")
 STATICDIR: Path = Path("static")
 TEMPLATEDIR: Path = Path("templates")
-COMMANDS: Tuple[str, ...] = ("build", "clean", "init", "serve")
+COMMANDS: Tuple[str, ...] = ("build", "clean", "init", "serve", "publish")
 EXTS: Dict[str, str] = {
     ".md": "MarkdownPost",
     ".ipynb": "NotebookPost",
@@ -355,12 +355,6 @@ def parse_args(args: List[str]) -> Namespace:
     parsed_args.orig_args = args
     return parsed_args
 
-def parse_command(args: List[str]) -> Namespace:
-    parser = ArgumentParser(description="blog: a static blog generator.")
-    parser.add_argument("command", choices=COMMANDS, help="command to execute")
-    parsed_args = parser.parse_args(args)
-    return parsed_args
-
 def parse_build(args: List[str]) -> Namespace:
     parser = ArgumentParser(description="blog-build: build the blog.")
     parsed_args = parser.parse_args(args)
@@ -371,8 +365,20 @@ def parse_clean(args: List[str]) -> Namespace:
     parsed_args = parser.parse_args(args)
     return parsed_args
 
+def parse_command(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog: a static blog generator.")
+    parser.add_argument("command", choices=COMMANDS, help="command to execute")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
 def parse_init(args: List[str]) -> Namespace:
     parser = ArgumentParser(description="blog-init: initialize the blog.")
+    parsed_args = parser.parse_args(args)
+    return parsed_args
+
+def parse_publish(args: List[str]) -> Namespace:
+    parser = ArgumentParser(description="blog-publish: publish the blog.")
+    parser.add_argument("destination", help="destination to rsync to in the form user@host:/path/to/folder")
     parsed_args = parser.parse_args(args)
     return parsed_args
 
@@ -401,6 +407,15 @@ def command_init(args: Namespace):
         os.makedirs(directory, exist_ok=True)
     symbolic_link(STATICDIR, HTMLDIR)
     symbolic_link(STATICDIR, POSTDIR)
+
+def command_publish(args: Namespace):
+    destination = args.destination
+    if not destination.endswith("/"):
+        destination = destination + "/"
+    exit_code = subprocess.call(["rsync", "-avP", "--delete", "./", args.destination])
+    if exit_code:
+        raise subprocess.CalledProcessError(f"rsync exited with exit code {exit_code}")
+    print("\nblog published.")
 
 def command_serve(args: Namespace):
     if not args.no_fork:
