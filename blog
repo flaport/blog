@@ -161,7 +161,7 @@ class NotebookPost(Post):
         super().__init__(path)
         self.json = self.readjson()
         self._replace_raw_cell_by_markdown_cell(self.json)
-        self.interactive_plots = self._patch_json_for_plotly(self.json)
+        self.interactive_plots = self._patch_json_for_interactive_plots(self.json)
         self.lines = self.readlines()
     def readjson(self) -> Dict:
         with open(self.path, "r") as file:
@@ -174,8 +174,13 @@ class NotebookPost(Post):
                 cell['cell_type'] = 'markdown'
                 cell['source'] = ['\n```\n',*cell['source'],'\n```\n']
     @staticmethod
-    def _patch_json_for_plotly(dic: Dict) -> Dict[str, str]:
-        template = ('<div id="{id}" class="plotly-graph-div"></div>\n'
+    def _patch_json_for_interactive_plots(dic: Dict) -> Dict[str, str]:
+        vega = ('<div id="vis{id}"></div>\n'
+                '<script type="text/javascript">\n'
+                'var spec = {spec}\n'
+                'vegaEmbed("#vis{id}", spec, {{"actions":false}});\n'
+                '</script>')
+        plotly = ('<div id="{id}" class="plotly-graph-div"></div>\n'
                     '<script type="text/javascript">\n'
                     'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
                     'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
@@ -190,14 +195,18 @@ class NotebookPost(Post):
                 data = output.get('data')
                 if not data:
                     continue
-                keys = [k for k in data if 'plotly' in k]
+                keys = [k for k in data if ('plotly' in k or 'vega' in k)]
                 if not keys:
                     continue
+                del data['image/png']
                 data['text/plain'] = ''
                 for key in keys:
                     id = secrets.token_hex(8)
                     data['text/plain'] = data['text/plain'] + "{{ %s }}\n"%id
-                    interactive_plots['{{ %s }}'%id] = template.format(id=id, spec=json.dumps(data[key]))
+                    if 'vega' in key:
+                        interactive_plots['{{ %s }}'%id] = vega.format(id=id, spec=json.dumps(data[key]))
+                    elif 'plotly' in key:
+                        interactive_plots['{{ %s }}'%id] = plotly.format(id=id, spec=json.dumps(data[key]))
         return interactive_plots
     @staticmethod
     def _patch_html_for_plotly(html: str, plots: Dict[str, str]) -> str:
