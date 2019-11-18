@@ -102,8 +102,8 @@ class Post:
         self.tags: List[Tag] = []
         self._posts[path] = self
         self.lines = self.readlines()
-    def render(self):
-        html = self._template.render(page=self)
+    def render(self, **kwargs):
+        html = self._template.render(page=self, **kwargs)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     def readlines(self) -> List[str]:
@@ -248,8 +248,8 @@ class NotebookPost(Post):
     @cache()
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
-    def render(self):
-        html = self._template.render(page=self)
+    def render(self, **kwargs):
+        html = self._template.render(page=self, **kwargs)
         html = self._patch_html_for_plotly(html, self.interactive_plots)
         html = self._patch_html_for_vega(html)
         with open(HTMLDIR/self.uri(), "w") as file:
@@ -300,8 +300,8 @@ class Tag:
             post.tags.append(self)
         post.tags = sorted(post.tags, key=lambda x: x.name())
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
-    def render(self):
-        html = self._template.render(page=self)
+    def render(self, **kwargs):
+        html = self._template.render(page=self, **kwargs)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()
@@ -333,14 +333,17 @@ class Index:
             self.tags.append(Tag(tag_path))
         self.tags = sorted(self.tags, key=lambda x: x.name())
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
-    def render(self):
-        html = self._template.render(page=self)
-        for post in self.posts:
+    def render(self, **kwargs):
+        html = self._template.render(page=self, next_post=self.posts[0], tags=self.tags, **kwargs)
+        num_posts = len(self.posts)
+        for i, post in enumerate(self.posts):
+            previous_post = None if i==0 else self.posts[i-1]
+            next_post = None if i == num_posts-1 else self.posts[i+1]
             print(post.name())
-            post.render()
+            post.render(next_post=next_post, previous_post=previous_post, tags=self.tags)
         for tag in self.tags:
             print(tag.name())
-            tag.render()
+            tag.render(tags=self.tags)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()

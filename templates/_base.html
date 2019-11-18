@@ -1,29 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ page.title() }}</title>
-    <link rel="shortcut icon" type="image/png" href="">
-    <link rel="stylesheet" href="/static/css/normalize.css">
-    <link rel="stylesheet" href="/static/css/fonts.css">
-    <link rel="stylesheet" href="/static/css/colors.css">
-    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="shortcut icon" type="image/png" href="" />
+    <link rel="stylesheet" href="/static/css/normalize.css" />
+    <link rel="stylesheet" href="/static/alabaster/basic.css" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="/static/alabaster/alabaster.css"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="/static/css/fonts.css" />
+    <link rel="stylesheet" href="/static/css/colors.css" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+
+    <script
+      id="documentation_options"
+      src="/static/alabaster/documentation_options.js"
+    ></script>
+    <script src="/static/alabaster/jquery.js"></script>
+    <script src="/static/alabaster/underscore.js"></script>
+    <script src="/static/alabaster/doctools.js"></script>
+    <script src="/static/alabaster/language_data.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/vega"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script> window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } }; </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-</head>
-<body>
-    <a href="/">Home</a>
-    <input type="checkbox" id="darkmodetoggle" />darkmode
-        {% block content %}
-        {% endblock content %}
-<script src="/static/js/localdates.js"></script>
-<script src="/static/js/toggledarkmode.js"></script>
-</body>
-</html>
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"],
+          ],
+        },
+      };
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+    <script
+      crossorigin="anonymous"
+      integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA="
+      src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"
+    ></script>
+  </head>
+  <body>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="fa" align="right">
+            &nbsp;<input type="checkbox" id="darkmodetoggle" />
+          </div>
+          <div class="body" role="main">
+            {% block content %} {% endblock content %}
+          </div>
+        </div>
+      </div>
 
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+          <h1 class="logo"><a href="/">Flaport.net</a></h1>
+
+          <h3>Blog</h3>
+          <ul>
+            <li class="toctree-l1">
+              <a class="reference internal" href="/">Home</a>
+            </li>
+            {% if next_post %}
+            <li class="toctree-l1">
+                <a class="reference internal" href="/{{ next_post.uri() }}">Next&nbsp;Post</a>
+            </li>
+            {% endif %}
+            {% if previous_post %}
+            <li class="toctree-l1">
+                <a class="reference internal" href="/{{ previous_post.uri() }}">Previous&nbsp;Post</a>
+            </li>
+            {% endif %}
+            <h3 style="padding-top: 1em;">Tags</h3>
+            {% for tag in tags %}
+            <li class="toctree-l1">
+                <a class="reference internal" href="/{{ tag.uri() }}">{{ tag.name() }}</a>
+            </li>
+            {% endfor %}
+            <h3 style="padding-top: 1em;">External links</h3>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://github.com/flaport"
+                >GitHub&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://photontorch.com"
+                >Photontorch&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://fdtd.readthedocs.org"
+                >Python&nbsp;3D&nbsp;FDTD&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://www.photonics.intec.ugent.be/contact/people.asp?ID=424"
+                >Academic&nbsp;Profile&nbsp;<span class="fa"></span></a
+              >
+            </li>
+          </ul>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <script src="/static/js/localdates.js"></script>
+    <script src="/static/js/toggledarkmode.js"></script>
+  </body>
+</html>

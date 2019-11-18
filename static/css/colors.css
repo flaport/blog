@@ -42,17 +42,55 @@ pre {
   background: var(--color8);
   border-color: var(--color4);
 }
+div.sphinxsidebar a:link {
+  color: var(--color15);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color15);
+}
+div.sphinxsidebar a:visited {
+  color: var(--color15);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color15);
+}
+div.sphinxsidebar a:hover {
+  color: var(--color7);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color7);
+}
+div.sphinxsidebar a:active {
+  color: var(--color1);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color1);
+}
 a:link {
-  color: var(--color4);
+  color: var(--color15);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color15);
 }
 a:visited {
-  color: var(--color4);
+  color: var(--color15);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color15);
 }
 a:hover {
-  color: var(--color5);
+  color: var(--color7);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color7);
 }
 a:active {
   color: var(--color1);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color1);
+}
+a.anchor-link {
+  color: #00000000;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color8);
+}
+a.anchor-link:hover {
+  color: var(--color7);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color8);
 }
 .output {
   background: var(--color0);
