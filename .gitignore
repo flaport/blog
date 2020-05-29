@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 .mypy_cache/
+html/
 
 .tags
 *.egg-info
