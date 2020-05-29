@@ -26,6 +26,12 @@
   font-family: "FontAwesome";
   src: url("/static/fonts/fontawesome-regular.ttf");
 }
+.fa {
+  font-family: FontAwesome;
+  font-size: 0.9em;
+}
+
+/*
 h1,
 h2,
 h3,
@@ -59,7 +65,4 @@ pre {
   font-size: 0.8em;
   line-height: 1.1;
 }
-.fa {
-  font-family: FontAwesome;
-  font-size: 0.9em;
-}
+*/
