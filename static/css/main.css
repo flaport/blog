@@ -34,3 +34,8 @@ pre {
 .prompt.output_prompt {
   display: none;
 }
+a[href*="://"]
+{
+  background: url(/static/img/external-link.svg) center right no-repeat;
+  padding-right: 0.7em;
+}

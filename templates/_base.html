@@ -4,7 +4,11 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ page.title() }}</title>
+    {% if page.title() %}
+    <title>Flaport.net | {{ page.title() }}</title>
+    {% else %}
+    <title>Flaport.net</title>
+    {% endif %}
     <link rel="shortcut icon" type="image/png" href="" />
     <link rel="stylesheet" href="/static/css/normalize.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/basic.css" type="text/css" />
@@ -82,33 +86,33 @@
             <h3 style="padding-top: 1em;">Projects</h3>
             <li class="toctree-l1">
               <a class="reference internal" href="https://photontorch.com"
-                >Photontorch&nbsp;<span class="fa"></span></a
+                >Photontorch</a
               >
             </li>
             <li class="toctree-l1">
               <a class="reference internal" href="https://github.com/flaport/fdtd"
-                >Python&nbsp;3D&nbsp;FDTD&nbsp;<span class="fa"></span></a
+                >Python&nbsp;3D&nbsp;FDTD</a
               >
             </li>
             <h3 style="padding-top: 1em;">External links</h3>
             <li class="toctree-l1">
               <a class="reference internal" href="https://github.com/flaport"
-                >GitHub&nbsp;<span class="fa"></span></a
+                >GitHub&nbsp;<span class="fa">&nbsp;</span></a
               >
             </li>
             <li class="toctree-l1">
               <a class="reference internal" href="https://twitter.com/florislaporte"
-                >Twitter&nbsp;<span class="fa"></span></a
+                >Twitter&nbsp;<span class="fa">&nbsp;</span></a
               >
             </li>
             <li class="toctree-l1">
               <a class="reference internal" href="https://linkedin.com/in/florislaporte"
-                >Linked In&nbsp;<span class="fa"></span></a
+                >Linked&nbsp;<span class="fa">&nbsp;</span></a
               >
             </li>
             <li class="toctree-l1">
               <a class="reference internal" href="https://www.photonics.intec.ugent.be/contact/people.asp?ID=424"
-                >Academic&nbsp;Profile&nbsp;<span class="fa"></span></a
+                >Academic&nbsp;Profile</a
               >
             </li>
           </ul>
@@ -116,6 +120,7 @@
       <div class="clearer"></div>
     </div>
     <script src="/static/js/localdates.js"></script>
+    <script src="/static/js/externallinks.js"></script>
     <script src="/static/js/toggledarkmode.js"></script>
   </body>
 </html>

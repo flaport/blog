@@ -360,7 +360,7 @@ class Index:
         return "index"
     @cache()
     def title(self) -> str:
-        return self.name().capitalize()
+        return ""
     @cache()
     def uri(self) -> str:
         return f"{self.name()}.html"
