@@ -306,6 +306,9 @@ class Tag:
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
     @cache()
+    def num_posts(self) -> int:
+        return int(len(self.posts))
+    @cache()
     def name(self) -> str:
         return str(self.path.relative_to(TAGDIR).stem)
     @cache()
@@ -332,21 +335,26 @@ class Index:
             if not tag_path.is_dir():
                 continue
             self.tags.append(Tag(tag_path))
-        self.tags = sorted(self.tags, key=lambda x: x.name())
+        self.tags = sorted(self.tags, key=lambda x: x.num_posts(), reverse=True)
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
         html = self._template.render(page=self, next_post=self.posts[0], tags=self.tags, **kwargs)
         num_posts = len(self.posts)
+        print("\nposts:\n------")
         for i, post in enumerate(self.posts):
             previous_post = None if i==0 else self.posts[i-1]
             next_post = None if i == num_posts-1 else self.posts[i+1]
             print(post.name())
             post.render(next_post=next_post, previous_post=previous_post, tags=self.tags)
+        print("\ntags:\n-----")
         for tag in self.tags:
             print(tag.name())
             tag.render(tags=self.tags)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
+    @cache()
+    def num_posts(self) -> int:
+        return int(len(self.posts))
     @cache()
     def name(self) -> str:
         return "index"

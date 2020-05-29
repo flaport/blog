@@ -76,23 +76,34 @@
             <h3 style="padding-top: 1em;">Tags</h3>
             {% for tag in tags %}
             <li class="toctree-l1">
-                <a class="reference internal" href="/{{ tag.uri() }}">{{ tag.name() }}</a>
+                <a class="reference internal" href="/{{ tag.uri() }}">{{ tag.name() }}</a> ({{ tag.num_posts() }})
             </li>
             {% endfor %}
-            <h3 style="padding-top: 1em;">External links</h3>
-            <li class="toctree-l1">
-              <a class="reference internal" href="https://github.com/flaport"
-                >GitHub&nbsp;<span class="fa"></span></a
-              >
-            </li>
+            <h3 style="padding-top: 1em;">Projects</h3>
             <li class="toctree-l1">
               <a class="reference internal" href="https://photontorch.com"
                 >Photontorch&nbsp;<span class="fa"></span></a
               >
             </li>
             <li class="toctree-l1">
-              <a class="reference internal" href="https://fdtd.readthedocs.org"
+              <a class="reference internal" href="https://github.com/flaport/fdtd"
                 >Python&nbsp;3D&nbsp;FDTD&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <h3 style="padding-top: 1em;">External links</h3>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://github.com/flaport"
+                >GitHub&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://twitter.com/florislaporte"
+                >Twitter&nbsp;<span class="fa"></span></a
+              >
+            </li>
+            <li class="toctree-l1">
+              <a class="reference internal" href="https://linkedin.com/in/florislaporte"
+                >Linked In&nbsp;<span class="fa"></span></a
               >
             </li>
             <li class="toctree-l1">
