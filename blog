@@ -34,6 +34,7 @@ COMMANDS: Tuple[str, ...] = ("build", "clean", "init", "serve", "publish")
 EXTS: Dict[str, str] = {
     ".md": "MarkdownPost",
     ".ipynb": "NotebookPost",
+    ".html": "HtmlPost",
 }
 
 ## Decorators
@@ -131,20 +132,26 @@ class Post:
         return f"{self.name()}.html"
     @cache()
     def utcpublished(self) -> datetime:
-        datetimestr = subprocess.check_output(['git', 'log', '--diff-filter=A', '--follow', '--format=%aD', '--max-count=1', '--', self.path]).decode().strip()
-        localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
-        assert localdatetime.tzinfo is not None
-        utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
-        assert utcoffset is not None
-        return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+        try:
+            datetimestr = subprocess.check_output(['git', 'log', '--diff-filter=A', '--follow', '--format=%aD', '--max-count=1', '--', self.path]).decode().strip()
+            localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
+            assert localdatetime.tzinfo is not None
+            utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+            assert utcoffset is not None
+            return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+        except ValueError:
+            return datetime.utcnow()
     @cache()
     def utcmodified(self) -> datetime:
-        datetimestr = subprocess.check_output(["git", "log", "-1", '--format=%aD', "--", self.path]).decode().strip()
-        localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
-        assert localdatetime.tzinfo is not None
-        utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
-        assert utcoffset is not None
-        return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+        try:
+            datetimestr = subprocess.check_output(["git", "log", "-1", '--format=%aD', "--", self.path]).decode().strip()
+            localdatetime = datetime.strptime(datetimestr, "%a, %d %b %Y %H:%M:%S %z")
+            assert localdatetime.tzinfo is not None
+            utcoffset = localdatetime.tzinfo.utcoffset(localdatetime)
+            assert utcoffset is not None
+            return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
+        except ValueError:
+            return datetime.utcnow()
     @cache()
     def summary(self) -> str:
         lines = []
@@ -277,6 +284,28 @@ class MarkdownPost(NotebookPost):
              "nbformat_minor": 4
         }
         return dic
+
+class HtmlPost(Post):
+    def render(self, **kwargs):
+        html = self._template.render(page=self, **kwargs)
+        with open(HTMLDIR/self.uri(), "w") as file:
+            print(html, file=file)
+    def readlines(self) -> List[str]:
+        with open(self.path, "r") as file:
+            lines = file.read().split("\n")
+        return lines
+    @cache()
+    def author(self) -> str:
+        author = subprocess.check_output(['git', 'log', '--pretty=format:%an%x09', self.path]).decode().split("\n")[0].strip()
+        if not author:
+            author = "Anonymous"
+        return author.lower().capitalize()
+    @cache()
+    def content(self) -> str:
+        return "\n".join(self.lines[1:])
+    @cache()
+    def title(self) -> str:
+        return self.lines[0].split("<h1>")[1].split("</h1>")[0]
 
 
 class Tag:
