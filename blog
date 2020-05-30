@@ -332,7 +332,7 @@ class Tag:
             post: Post = cls(post_path)
             self.posts.append(post)
             post.tags.append(self)
-        post.tags = sorted(post.tags, key=lambda x: x.name())
+        post.tags = sorted(post.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
         html = self._template.render(page=self, **kwargs)
@@ -368,7 +368,7 @@ class Index:
             if not tag_path.is_dir():
                 continue
             self.tags.append(Tag(tag_path))
-        self.tags = sorted(self.tags, key=lambda x: x.num_posts(), reverse=True)
+        self.tags = sorted(self.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
         html = self._template.render(page=self, next_post=self.posts[0], tags=self.tags, **kwargs)
