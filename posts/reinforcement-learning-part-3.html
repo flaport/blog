@@ -56,7 +56,6 @@ Have fun! </p>
         </div>
     </div>
     <div id="ttt-msg">Player O's turn</div>
-</div>
 <script>
 var arr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 var msg = document.getElementById("ttt-msg");
@@ -69,7 +68,7 @@ var swapPlayer = function(symbol){
     var otherSymbol = symbol == "O" ? "X" : "O"
     var player = document.getElementById("ttt-player" + symbol).innerHTML;
     var otherPlayer = document.getElementById("ttt-player" + otherSymbol).innerHTML;
-    if (msg.innerHTML == "player O won!" || msg.innerHTML == "player X won!"){
+    if (msg.innerHTML == "player O won!" || msg.innerHTML == "player X won!"|| msg.innerHTML == "Tie."){
         restart()
     }
     if (player == human && otherPlayer == human){
@@ -118,7 +117,7 @@ var robotPlay = function(){
 }
 var clickButton = function(idx){
     var cell = document.getElementById("ttt-"+idx.toString());
-    if (cell.innerHTML || msg.innerHTML == "player O won!" || msg.innerHTML == "player X won!"){
+    if (cell.innerHTML || msg.innerHTML == "player O won!" || msg.innerHTML == "player X won!" || msg.innerHTML == "Tie."){
         return
     }
 
@@ -141,11 +140,13 @@ var clickButton = function(idx){
     if (arr[0] == -1 &&  arr[4] == -1 && arr[8] == -1){return msg.innerHTML = "player X won!"; }
     if (arr[6] ==  1 &&  arr[4] ==  1 && arr[2] ==  1){return msg.innerHTML = "player O won!"; }
     if (arr[6] == -1 &&  arr[4] == -1 && arr[2] == -1){return msg.innerHTML = "player X won!"; }
-
-    msg.innerHTML = "Player " + currentPlayer() + "'s turn";
-
-    if (document.getElementById("ttt-player" + currentPlayer()).innerHTML == robot){
-        robotPlay();
+    if (arr.reduce((r,x)=>r+(x==1 ? x : 0), 0) == 5 ){
+        msg.innerHTML = "Tie."
+    } else {
+        msg.innerHTML = "Player " + currentPlayer() + "'s turn";
+        if (document.getElementById("ttt-player" + currentPlayer()).innerHTML == robot){
+            robotPlay();
+        }
     }
 }
 document.getElementById("ttt-1").addEventListener("click",function(e){clickButton(1);},false);
