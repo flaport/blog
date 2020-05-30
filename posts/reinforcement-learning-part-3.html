@@ -26,16 +26,20 @@ Have fun! </p>
   background-color: #88888888;
 }
 .ttt-cell#ttt-a {
-  font-size: 28px;
+  font-size: 24px;
   background-color: #0000ff88;
 }
 .ttt-cell#ttt-b {
-  font-size: 28px;
+  font-size: 24px;
   background-color: #0000ff88;
 }
 .ttt-cell#ttt-c {
-  font-size: 28px;
+  font-size: 24px;
   background-color: #ff000088;
+}
+.emoji {
+  padding-top: 10px;
+  font-size: 40px;
 }
 </style>
 
@@ -50,9 +54,9 @@ Have fun! </p>
             <div class="ttt-cell" id="ttt-7"></div>
             <div class="ttt-cell" id="ttt-8"></div>
             <div class="ttt-cell" id="ttt-9"></div>
-            <div class="ttt-cell" id="ttt-a">Player O<br><span id="ttt-playerO">🤓</span></div>
-            <div class="ttt-cell" id="ttt-b">Player X<br><span id="ttt-playerX">🤖</span></div>
-            <div class="ttt-cell" id="ttt-c">Restart<br>↩</div>
+            <div class="ttt-cell" id="ttt-a">Player O<div class="emoji" id="ttt-playerO">🤓</div></div>
+            <div class="ttt-cell" id="ttt-b">Player X<div class="emoji" id="ttt-playerX">🤖</div></div>
+            <div class="ttt-cell" id="ttt-c">Restart<div class="emoji">↩</div></div>
         </div>
     </div>
     <div id="ttt-msg">Player O's turn</div>
