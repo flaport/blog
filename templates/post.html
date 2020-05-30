@@ -2,17 +2,21 @@
 
 {% block content %}
     <h1>{{ page.title() }}</h1>
-    <p>
-    author: {{ page.author() }}&nbsp;&middot;
-    published: <a class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
-    {% if page.utcmodified().strftime("%Y-%m-%d") != page.utcpublished().strftime("%Y-%m-%d") %}
-    last modified: <a class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+<!-- author: {{ page.author() }}&nbsp;&middot; -->
+posted on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+{% if page.utcmodified().strftime("%Y-%m-%d") != page.utcpublished().strftime("%Y-%m-%d") %}
+last modified on <a href="#" class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+{% endif %}
+{% if page.tags %}
+tags:
+{% endif %}
+{% for tag in page.tags %}
+    {% if page.uri() != tag.uri() %}
+        <span><a href="/{{ tag.uri() }}">{{ tag.name() }}</a>  </span>
+    {% else %}
+        <span>{{ tag.name() }}  </span>
     {% endif %}
-    tags:
-    {% for tag in page.tags %}
-        <a href="/{{ tag.uri() }}">{{ tag.name() }}</a>&nbsp;
-    {% endfor %}
-    </p>
+{% endfor %}
     {{ page.content() }}
 
 <script data-isso="//isso.flaport.net/" src="//isso.flaport.net/js/embed.min.js"></script>
