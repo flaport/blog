@@ -1,0 +1,22 @@
+<rss version="2.0">
+<channel>
+<title>Flaport.net</title>
+<link>https://blog.flaport.net/{{ page.uri() }}</link>
+<description>Flaport.net posts</description>
+<generator>Flaport.net</generator>
+<language>en-US</language>
+<copyright>Copyright (c) {{ date.strftime("%Y") }}, all rights reserved.</copyright>
+<lastBuildDate>{{ date.strftime("%Y-%m-%dT%H:%M:%SZ") }}</lastBuildDate>
+{% for post in page.posts %}
+<item>
+<title>{{ post.title() }}</title>
+<link>https://blog.flaport.net/{{ post.uri() }}</link>
+<pubDate>{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</pubDate>
+<guid>https://blog.flaport.net/{{ post.uri() }}</guid>
+<description>
+{{ post.textsummary() }}
+</description>
+</item>
+{% endfor %}
+</channel>
+</rss>

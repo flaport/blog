@@ -163,6 +163,10 @@ class Post:
         html = md2html("\n".join(lines))
         return html
     @cache()
+    def textsummary(self) -> str:
+        summary = self.summary()
+        return re.sub("<.*?>", "", summary)
+    @cache()
     def title(self) -> str:
         title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
         return title
@@ -353,6 +357,7 @@ class Tag:
 
 class Index:
     _template = get_template("index.html")
+    _xmltemplate = get_template("index.xml")
     def __init__(self):
         self.posts, self.tags = [], []
         for post_path in POSTDIR.glob("*"):
@@ -372,6 +377,7 @@ class Index:
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
         html = self._template.render(page=self, next_post=self.posts[0], tags=self.tags, **kwargs)
+        xml = self._xmltemplate.render(page=self, date=datetime.utcnow(), **kwargs)
         num_posts = len(self.posts)
         print("\nposts:\n------")
         for i, post in enumerate(self.posts):
@@ -385,6 +391,8 @@ class Index:
             tag.render(tags=self.tags)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
+        with open(f"{HTMLDIR/self.uri()[:-5]}.xml", "w") as file:
+            print(xml, file=file)
     @cache()
     def num_posts(self) -> int:
         return int(len(self.posts))
