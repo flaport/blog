@@ -61,6 +61,7 @@ Have fun! </p>
     </div>
     <div id="ttt-msg">Player O's turn</div>
 <script>
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0"
 var arr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 var msg = document.getElementById("ttt-msg");
 var keyVector = [...Array(9).keys()].map(x=>3**x);
@@ -165,4 +166,5 @@ document.getElementById("ttt-9").addEventListener("click",function(e){clickButto
 document.getElementById("ttt-a").addEventListener("click",function(e){swapPlayer("O");},false);
 document.getElementById("ttt-b").addEventListener("click",function(e){swapPlayer("X");},false);
 document.getElementById("ttt-c").addEventListener("click",function(e){restart();},false);
+// @license-end
 </script>

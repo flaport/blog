@@ -186,11 +186,12 @@ class NotebookPost(Post):
                 'vegaEmbed("#vis{id}", spec, {{"actions":false}});\n'
                 '</script>')
         plotly = ('<div id="{id}" class="plotly-graph-div"></div>\n'
-                    '<script type="text/javascript">\n'
-                    'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
-                    'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
-                    'var spec = {spec}\n'
-                    'Plotly.newPlot("{id}", spec, {{}}, {{"showLink": false, "linkText": ""}})</script>\n')
+                  '<script type="text/javascript">\n'
+                  'window.PLOTLYENV=window.PLOTLYENV || {{}}\n'
+                  'window.PLOTLYENV.BASE_URL="https://plot.ly"\n'
+                  'var spec = {spec}\n'
+                  'Plotly.newPlot("{id}", spec, {{}}, {{"showLink": false, "linkText": ""}})\n'
+                  '\n</script>\n')
         vega_plots = {}
         plotly_plots = {}
         for i, cell in enumerate(dic['cells']):
@@ -246,6 +247,32 @@ class NotebookPost(Post):
         html = html.replace('"mode": "vega-lite"', '"mode": "vega-lite", "actions": false')
         html = re.sub('"view": {([^}]*)}', r'"view": {\1}, "background": "#00000000"', html)
         return html
+    def _patch_js_license_in_html(self, html: str) -> str:
+        lines = html.split("\n")
+        for i, line in enumerate(lines):
+            if not "<script" in line:
+                continue
+            if "PlotlyConfig" in lines[i+1]:
+                lines[i+1] = f"// @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt Expat\n{lines[i+1]}"
+                for j, line in enumerate(lines[i:]):
+                    if "</script>" in line:
+                        break
+                lines[i+j] = "// @license-end\n</script>"
+            if "vega.github.io" in lines[i+1]:
+                lines[i+1] = f"// @license magnet:?xt=urn:btih:c80d50af7d3db9be66a4d0a86db0286e4fd33292&dn=bsd-3-clause.txt BSD-3-Clause\n{lines[i+1]}"
+                for j, line in enumerate(lines[i:]):
+                    if "</script>" in line:
+                        break
+                lines[i+j] = lines[i+j].replace("</script>", "// @license-end\n</script>")
+            if "plotly-graph-div" in lines[i-1]:
+                lines[i+1] = f"// @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt Expat\n{lines[i+1]}"
+                for j, line in enumerate(lines[i:]):
+                    if "</script>" in line:
+                        break
+                lines[i+j] = lines[i+j].replace("</script>", "\n// @license-end\n</script>")
+
+        html = "\n".join(lines)
+        return html
     def readlines(self) -> List[str]:
         if not hasattr(self, "json"):
             return []
@@ -268,6 +295,7 @@ class NotebookPost(Post):
         html = self._template.render(page=self, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
         html = self._patch_html_for_plotly(html)
         html = self._patch_html_for_vega(html)
+        html = self._patch_js_license_in_html(html)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
 
