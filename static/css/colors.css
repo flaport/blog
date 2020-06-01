@@ -1,23 +1,23 @@
 :root {
   --color0: #ffffff;
-  --color1: #bf616a;
-  --color2: #a3be8c;
-  --color3: #ebcb8b;
-  --color4: #5e81ac;
-  --color5: #b48ead;
-  --color6: #8fbcbb;
-  --color7: #4c566a;
-  --color8: #e5e9f0;
-  --color9: #bf616a;
-  --color10: #a3be8c;
-  --color11: #ebcb8b;
-  --color12: #5e81ac;
-  --color13: #b48ead;
-  --color14: #8fbcbb;
-  --color15: #3b4252;
+  --color1: #dc322f;
+  --color2: #859900;
+  --color3: #b58900;
+  --color4: #268bd2;
+  --color5: #935692;
+  --color6: #2aa198;
+  --color7: #002b36;
+  --color8: #ffffef;
+  --color9: #ff322f;
+  --color10: #85b900;
+  --color11: #f5c900;
+  --color12: #268bff;
+  --color13: #d33682;
+  --color14: #00a1a8;
+  --color15: #073642;
 }
 [data-theme="dark"] {
-  --color0: #3b4252;
+  --color0: #363c4a;
   --color1: #bf616a;
   --color2: #a3be8c;
   --color3: #ebcb8b;
@@ -25,7 +25,7 @@
   --color5: #b48ead;
   --color6: #8fbcbb;
   --color7: #eceff4;
-  --color8: #4c566a;
+  --color8: #404859;
   --color9: #bf616a;
   --color10: #a3be8c;
   --color11: #ebcb8b;
