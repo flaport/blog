@@ -11,8 +11,6 @@
     {% endif %}
     <link rel="shortcut icon" type="image/png" href="" />
     <link rel="stylesheet" href="/static/css/normalize.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/basic.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/fonts.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/colors.css" type="text/css" />
     <link rel="stylesheet" href="/static/css/main.css" type="text/css" />
@@ -48,19 +46,17 @@
   </head>
   <body>
     <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-          <div class="fa" align="right">
-            &nbsp;<input type="checkbox" id="darkmodetoggle" />
+      <div class="contentwrapper">
+          <div class="fa noprint" align="right">
+            &nbsp;<input type="checkbox" class="noprint" id="darkmodetoggle" />
           </div>
+        <div class="content">
             {% block content %} {% endblock content %}
-          </div>
         </div>
       </div>
 
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
+      <div class="sidebar">
+        <div class="sidebarwrapper">
           <h1 class="logo"><a href="/">Flaport.net</a></h1>
 
           <h3>Blog</h3>
@@ -68,14 +64,19 @@
             <li class="toctree-l1">
               <a href="/">Home</a>
             </li>
+            {% if newest_post %}
+            <li class="toctree-l1">
+                <a href="/{{ newest_post.uri() }}">Latest&nbsp;post</a>
+            </li>
+            {% endif %}
             {% if next_post %}
             <li class="toctree-l1">
-                <a href="/{{ next_post.uri() }}">Next&nbsp;Post</a>
+                <a href="/{{ next_post.uri() }}">Next&nbsp;(newer)</a>
             </li>
             {% endif %}
             {% if previous_post %}
             <li class="toctree-l1">
-                <a href="/{{ previous_post.uri() }}">Previous&nbsp;Post</a>
+                <a href="/{{ previous_post.uri() }}">Previous&nbsp;(older)</a>
             </li>
             {% endif %}
             <li class="toctree-l1">
@@ -119,6 +120,9 @@
                 >Academic&nbsp;Profile</a
               >
             </li>
+            <div style="padding-top: 2em;">
+                <span class="fa"></span> Floris Laporte 2020
+            </div>
           </ul>
       </div>
     </div>

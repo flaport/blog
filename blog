@@ -376,13 +376,13 @@ class Index:
         self.tags = sorted(self.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
-        html = self._template.render(page=self, next_post=self.posts[0], tags=self.tags, **kwargs)
+        html = self._template.render(page=self, newest_post=self.posts[0], tags=self.tags, **kwargs)
         xml = self._xmltemplate.render(page=self, date=datetime.utcnow(), **kwargs)
         num_posts = len(self.posts)
         print("\nposts:\n------")
         for i, post in enumerate(self.posts):
-            previous_post = None if i==0 else self.posts[i-1]
-            next_post = None if i == num_posts-1 else self.posts[i+1]
+            next_post = None if i==0 else self.posts[i-1]
+            previous_post = None if i == num_posts-1 else self.posts[i+1]
             print(post.name())
             post.render(next_post=next_post, previous_post=previous_post, tags=self.tags)
         print("\ntags:\n-----")

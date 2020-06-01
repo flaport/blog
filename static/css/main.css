@@ -1,3 +1,318 @@
+div.sidebarwrapper {
+  padding: 10px 5px 0 10px;
+}
+
+div.sidebar {
+  float: left;
+  width: 230px;
+  margin-left: -100%;
+  font-size: 90%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+div.sidebar ul {
+  list-style: none;
+}
+
+div.sidebar ul ul {
+  margin-left: 20px;
+  list-style: square;
+}
+
+div.sidebar ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+div.sidebar input {
+  border: 1px solid #98dbcc;
+  font-family: sans-serif;
+  font-size: 1em;
+}
+
+img {
+  border: 0;
+  max-width: 100%;
+}
+
+div.body {
+  min-width: 450px;
+  max-width: 800px;
+}
+
+div.body p,
+div.body li {
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.first {
+  margin-top: 0 !important;
+}
+
+li > p:first-child {
+  margin-top: 0px;
+}
+
+li > p:last-child {
+  margin-bottom: 0px;
+}
+
+.optional {
+  font-size: 1.3em;
+}
+
+pre {
+  overflow: auto;
+  overflow-y: hidden;
+}
+
+span.pre {
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  -webkit-hyphens: none;
+  hyphens: none;
+}
+
+a code {
+  background-color: transparent;
+  font-weight: bold;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code {
+  background-color: transparent;
+}
+
+@media print {
+  div.document {
+    margin: 0 !important;
+    width: 100%;
+  }
+
+  div.sidebar {
+    display: none;
+  }
+
+  .noprint {
+    display: none;
+  }
+}
+
+body {
+  font-family: Georgia, serif;
+  font-size: 17px;
+  margin: 0;
+  padding: 0;
+}
+
+div.document {
+  width: 940px;
+  margin: 30px auto 0 auto;
+}
+
+div.contentwrapper {
+  float: left;
+  width: 100%;
+}
+
+div.content {
+  margin: 0 0 0 220px;
+}
+
+div.sidebar {
+  width: 220px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+div.content > .section {
+  text-align: left;
+}
+
+div.sidebar a {
+  text-decoration: none;
+  border-bottom: 1px dotted #999;
+}
+
+div.sidebar a:hover {
+  border-bottom: 1px solid #999;
+}
+
+div.sidebarwrapper {
+  padding: 18px 10px;
+}
+
+div.sidebarwrapper p.logo {
+  padding: 0;
+  margin: -10px 0 0 0px;
+  text-align: center;
+}
+
+div.sidebarwrapper h1.logo {
+  margin-top: -10px;
+  text-align: center;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+div.sidebar h3,
+div.sidebar h4 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: normal;
+  margin: 0 0 5px 0;
+  padding: 0;
+}
+
+div.sidebar h4 {
+  font-size: 20px;
+}
+
+div.sidebar p.logo a,
+div.sidebar h3 a,
+div.sidebar p.logo a:hover,
+div.sidebar h3 a:hover {
+  border: none;
+}
+
+div.sidebar p {
+  margin: 10px 0;
+}
+
+div.sidebar ul {
+  margin: 10px 0;
+  padding: 0;
+}
+
+div.sidebar ul li.toctree-l1 > a {
+  font-size: 120%;
+}
+
+div.sidebar input {
+  border: 1px solid #ccc;
+  font-family: Georgia, serif;
+  font-size: 1em;
+}
+
+a {
+  text-decoration: underline;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+div.content h1,
+div.content h2,
+div.content h3,
+div.content h4 {
+  font-family: Georgia, serif;
+  font-weight: normal;
+  margin: 30px 0px 10px 0px;
+  padding: 0;
+}
+
+div.content h1 {
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 240%;
+}
+div.content h2 {
+  font-size: 180%;
+}
+div.content h3 {
+  font-size: 150%;
+}
+div.content h4 {
+  font-size: 130%;
+}
+
+div.content p,
+div.content li {
+  line-height: 1.4em;
+}
+
+div.error {
+  background-color: #fcc;
+  border: 1px solid #faa;
+  -moz-box-shadow: 2px 2px 4px #d52c2c;
+  -webkit-box-shadow: 2px 2px 4px #d52c2c;
+  box-shadow: 2px 2px 4px #d52c2c;
+}
+
+pre,
+code {
+  font-family: "Consolas", "Menlo", "DejaVu Sans Mono",
+    "Bitstream Vera Sans Mono", monospace;
+  font-size: 0.9em;
+}
+
+ul {
+  margin: 10px 0 10px 30px;
+  padding: 0;
+}
+
+pre {
+  background: #eee;
+  padding: 7px 30px;
+  margin: 15px 0px;
+  line-height: 1.3em;
+}
+
+li pre {
+  margin-left: 0;
+  padding-left: 30px;
+}
+
+a.reference {
+  text-decoration: none;
+  border-bottom: 1px dotted #004b6b;
+}
+
+a.reference:hover {
+  border-bottom: 1px solid #6d4100;
+}
+
+@media screen and (max-width: 800px) {
+  body {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+  }
+
+  div.sidebar {
+    display: block;
+    float: none;
+    width: 100%;
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px;
+    background: var(--color8);
+  }
+
+  div.sidebar h1.logo {
+    display: none;
+  }
+
+  div.document {
+    width: 100%;
+    margin: 0;
+  }
+
+  div.contentwrapper {
+    float: none;
+    margin: 0 0 0 0;
+  }
+
+  div.content {
+    margin: 0 10px 0 10px;
+  }
+}
+
 pre {
   border-style: solid;
   border-radius: 0px;
