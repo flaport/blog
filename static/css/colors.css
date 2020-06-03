@@ -72,11 +72,17 @@ a.tag {
 a.tag:hover {
   border: 3px solid var(--color10);
 }
+a.hideborder {
+  border: 1px solid var(--color0);
+}
+a.hideborder:hover {
+  border: 3px solid var(--color10);
+}
 span.currenttag {
   border: 1px solid var(--color15);
 }
 span.currenttag:hover {
-  border: 1px solid var(--color15);
+  border: 3px solid var(--color15);
 }
 .tooltip .tooltiptext {
   color: var(--color8);

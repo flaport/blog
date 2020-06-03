@@ -107,10 +107,16 @@ class Post:
         self.tags: List[Tag] = []
         self._posts[path] = self
         self.lines = self.readlines()
-    def render(self, **kwargs):
-        html = self._template.render(page=self, **kwargs)
-        with open(HTMLDIR/self.uri(), "w") as file:
+    def save_html(self, html, tag=None):
+        if tag:
+            filename = HTMLDIR/f"{tag.uri()}{self.uri()}"
+        else:
+            filename = HTMLDIR/self.uri()
+        with open(filename, "w") as file:
             print(html, file=file)
+    def render(self, index=None, tag=None, **kwargs):
+        html = self._template.render(page=self, index=index, tag=tag, **kwargs)
+        self.save_html(html, tag=tag)
     def readlines(self) -> List[str]:
         with open(self.path, "r") as file:
             lines = file.read().split("\n")
@@ -291,13 +297,12 @@ class NotebookPost(Post):
     @cache()
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
-    def render(self, **kwargs):
-        html = self._template.render(page=self, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
+    def render(self, index=None, tag=None, **kwargs):
+        html = self._template.render(page=self, index=index, tag=tag, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
         html = self._patch_html_for_plotly(html)
         html = self._patch_html_for_vega(html)
         html = self._patch_js_license_in_html(html)
-        with open(HTMLDIR/self.uri(), "w") as file:
-            print(html, file=file)
+        self.save_html(html, tag=tag)
 
 class MarkdownPost(NotebookPost):
     def readjson(self) -> Dict:
@@ -318,10 +323,9 @@ class MarkdownPost(NotebookPost):
         return dic
 
 class HtmlPost(Post):
-    def render(self, **kwargs):
-        html = self._template.render(page=self, **kwargs)
-        with open(HTMLDIR/self.uri(), "w") as file:
-            print(html, file=file)
+    def render(self, index=None, tag=None, **kwargs):
+        html = self._template.render(page=self, index=index, tag=tag, **kwargs)
+        self.save_html(html, tag=tag)
     def readlines(self) -> List[str]:
         with open(self.path, "r") as file:
             lines = file.read().split("\n")
@@ -338,7 +342,6 @@ class HtmlPost(Post):
     @cache()
     def title(self) -> str:
         return self.lines[0].split("<h1>")[1].split("</h1>")[0]
-
 
 class Tag:
     _tags: Dict[Path, 'Tag'] = {}
@@ -364,11 +367,19 @@ class Tag:
             post: Post = cls(post_path)
             self.posts.append(post)
             post.tags.append(self)
-        post.tags = sorted(post.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
-    def render(self, **kwargs):
-        html = self._template.render(page=self, **kwargs)
-        with open(HTMLDIR/self.uri(), "w") as file:
+        for post in self.posts:
+            post.tags = sorted(post.tags, key=lambda x: (-x.num_posts(), x.name()))
+        os.makedirs(HTMLDIR/TAGDIR/self.name())
+        symbolic_link(STATICDIR, HTMLDIR/TAGDIR/self.name())
+    def render(self, index=None, **kwargs):
+        html = self._template.render(page=self, index=index, tag=self, newest_post=self.posts[0], **kwargs)
+        num_posts = len(self.posts)
+        for i, post in enumerate(self.posts):
+            next_post = None if i==0 else self.posts[i-1]
+            previous_post = None if i == num_posts-1 else self.posts[i+1]
+            post.render(index=index, tag=self, next_post=next_post, previous_post=previous_post)
+        with open(HTMLDIR/self.uri()/"index.html", "w") as file:
             print(html, file=file)
     @cache()
     def num_posts(self) -> int:
@@ -384,7 +395,7 @@ class Tag:
         return str(stem.split("(")[1].split(")")[0].strip())
     @cache()
     def uri(self) -> str:
-        return str(TAGDIR/f"{self.name()}.html")
+        return str(TAGDIR/self.name())+"/"
     @cache()
     def title(self) -> str:
         name = self.name()
@@ -414,19 +425,19 @@ class Index:
         self.tags = sorted(self.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs):
-        html = self._template.render(page=self, newest_post=self.posts[0], tags=self.tags, **kwargs)
-        xml = self._xmltemplate.render(page=self, date=datetime.utcnow(), **kwargs)
+        html = self._template.render(page=self, index=self, newest_post=self.posts[0], **kwargs)
+        xml = self._xmltemplate.render(page=self, index=self, date=datetime.utcnow(), **kwargs)
         num_posts = len(self.posts)
         print("\nposts:\n------")
         for i, post in enumerate(self.posts):
             next_post = None if i==0 else self.posts[i-1]
             previous_post = None if i == num_posts-1 else self.posts[i+1]
             print(post.name())
-            post.render(next_post=next_post, previous_post=previous_post, tags=self.tags)
+            post.render(index=self, next_post=next_post, previous_post=previous_post)
         print("\ntags:\n-----")
         for tag in self.tags:
             print(tag.name())
-            tag.render(tags=self.tags)
+            tag.render(index=self)
         with open(HTMLDIR/self.uri(), "w") as file:
             print(html, file=file)
         with open(f"{HTMLDIR/self.uri()[:-5]}.xml", "w") as file:
@@ -442,7 +453,7 @@ class Index:
         return ""
     @cache()
     def uri(self) -> str:
-        return f"{self.name()}.html"
+        return "index.html"
 
 
 ## Argument parsers
@@ -505,8 +516,7 @@ def command_clean(args: Namespace):
 def command_init(args: Namespace):
     for directory in (HTMLDIR, TAGDIR, POSTDIR, STATICDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
         os.makedirs(directory, exist_ok=True)
-    # symbolic_link(STATICDIR, HTMLDIR)
-    copy_folder(STATICDIR, HTMLDIR)
+    symbolic_link(STATICDIR, HTMLDIR)
     symbolic_link(STATICDIR, POSTDIR)
 
 def command_publish(args: Namespace):

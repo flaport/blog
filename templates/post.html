@@ -3,7 +3,7 @@
 {% block content %}
     <h1>{{ page.title() }}</h1>
 <!-- author: {{ page.author() }}&nbsp;&middot; -->
-pageed on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
+posted on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% if page.utcmodified().strftime("%Y-%m-%d") != page.utcpublished().strftime("%Y-%m-%d") %}
 &middot;&nbsp;last modified on <a href="#" class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% endif %}

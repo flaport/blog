@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+{% if tag %}
+{% set currenttag = tag %}
+{% endif %}
 <html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -42,9 +45,19 @@
   <body>
     <div class="document">
       <div class="contentwrapper">
-          <div class="fa noprint" align="right">
-            &nbsp;<input type="checkbox" class="noprint" id="darkmodetoggle" />
+
+          <div class="noprint" align="right">
+          <span class="fa tooltip hideborder" style="cursor: default">
+                &nbsp;
+                <span class="tooltiptext">toggle dark mode</span>
+          </span>
+          <span class="fa tooltip hideborder" style="cursor: default">
+                <input type="checkbox" class="noprint" id="darkmodetoggle"/>
+                <span class="tooltiptext">toggle dark mode</span>
+          </span>
           </div>
+
+
         <div class="content">
             {% block content %} {% endblock content %}
         </div>
@@ -60,12 +73,20 @@
             {% if tag %}
             <li class="toctree-l1">
                 Tag: <a href="/{{ tag.uri() }}">{{ tag.longname() }}</a>
+                {% if page == tag %}
+                {% set uri = index.uri() %}
+                {% else %}
+                {% set uri = page.uri() %}
+                {% endif %}
+                <a class="fa tooltip hideborder" href="/{{ uri }}">
+                <span class="tooltiptext">exit [{{ tag.name() }}] tag view</span>
+                </a>
             </li>
             {% endif %}
             {% if newest_post %}
             <li class="toctree-l1">
                 {% if tag %}
-                <a href="/{{ newest_post.uri() }}">Newest {% include "_shorttag.html" %} Post</a>
+                <a href="/{{ tag.uri() }}{{ newest_post.uri() }}">Newest [{{ tag.name() }}] Post</a>
                 {% else %}
                 <a href="/{{ newest_post.uri() }}">Newest Post</a>
                 {% endif %}
@@ -74,7 +95,7 @@
             {% if next_post %}
             <li class="toctree-l1">
                 {% if tag %}
-                <a href="/{{ next_post.uri() }}">Newer post</a>
+                <a href="/{{ tag.uri() }}{{ next_post.uri() }}">Newer [{{ tag.name() }}] post</a>
                 {% else %}
                 <a href="/{{ next_post.uri() }}">Newer post</a>
                 {% endif %}
@@ -83,14 +104,14 @@
             {% if previous_post %}
             <li class="toctree-l1">
                 {% if tag %}
-                <a href="/{{ previous_post.uri() }}">Older post</a>
+                <a href="/{{ tag.uri() }}{{ previous_post.uri() }}">Older [{{ tag.name() }}] post</a>
                 {% else %}
                 <a href="/{{ previous_post.uri() }}">Older post</a>
                 {% endif %}
             </li>
             {% endif %}
             <h3 style="padding-top: 1em;">Tags</h3>
-            {% for tag in tags %}
+            {% for tag in index.tags %}
                 {% include "_tag.html" %}
             {% endfor %}
             <h3 style="padding-top: 1em;">Projects</h3>
@@ -125,7 +146,7 @@
             </li>
             <li class="toctree-l1">
               <a href="https://www.photonics.intec.ugent.be/contact/people.asp?ID=424"
-                >Academic&nbsp;Profile&nbsp;</a
+                 >Academic&nbsp;Profile&nbsp;<span class="fa"></span>&nbsp;</a
               >
             </li>
             <div style="padding-top: 2em;">

@@ -1,4 +1,8 @@
-<h2><a href="/{{ post.uri() }}">{{ post.title() }}</a></h2>
+{% if tag %}
+    <h2><a href="/{{ tag.uri() }}{{ post.uri() }}">{{ post.title() }}</a></h2>
+{% else %}
+    <h2><a href="/{{ post.uri() }}">{{ post.title() }}</a></h2>
+{% endif %}
 <!-- author: {{ post.author() }}&nbsp;&middot; -->
 posted on <a href="#" class="date">{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% if post.utcmodified().strftime("%Y-%m-%d") != post.utcpublished().strftime("%Y-%m-%d") %}

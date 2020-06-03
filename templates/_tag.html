@@ -1,5 +1,7 @@
-{% if page.uri() != tag.uri() %}
-<a class="tag tooltip" href="/{{ tag.uri() }}">{{ tag.name().replace(' ', '&nbsp;') }}<sup>&nbsp;({{ tag.num_posts() }})</sup><span class="tooltiptext">{{ tag.longname().replace(' ', '&nbsp;') }}</span></a>
+{% if tag %}
+{% if tag != currenttag %}
+<a class="tag tooltip" href="/{{ tag.uri() }}">{{ tag.name() }}<sup>&nbsp;({{ tag.num_posts() }})</sup>{% if tag.longname() != tag.name() %}<span class="tooltiptext">{{ tag.longname() }}</span>{% endif %}</a>
 {% else %}
-<span class="currenttag tooltip">{{ tag.longname().replace(' ', '&nbsp;') }}<sup>&nbsp;({{ tag.num_posts() }})</sup></span>
+<span class="currenttag tooltip">{{ tag.longname() }}<sup>&nbsp;({{ tag.num_posts() }})</sup></span>
+{% endif %}
 {% endif %}
