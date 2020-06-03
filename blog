@@ -375,13 +375,23 @@ class Tag:
         return int(len(self.posts))
     @cache()
     def name(self) -> str:
-        return str(self.path.relative_to(TAGDIR).stem)
+        return str(self.path.relative_to(TAGDIR).stem.split("(")[0].strip())
+    @cache()
+    def longname(self) -> str:
+        stem = self.path.relative_to(TAGDIR).stem
+        if not "(" in stem:
+            return self.name()
+        return str(stem.split("(")[1].split(")")[0].strip())
     @cache()
     def uri(self) -> str:
         return str(TAGDIR/f"{self.name()}.html")
     @cache()
     def title(self) -> str:
-        return self.name().capitalize()
+        name = self.name()
+        longname = self.longname()
+        if name == longname:
+            return name.capitalize()
+        return f"{longname.capitalize()} [{name.upper()}]"
 
 class Index:
     _template = get_template("index.html")

@@ -1,17 +1,15 @@
 <h2><a href="/{{ post.uri() }}">{{ post.title() }}</a></h2>
 <!-- author: {{ post.author() }}&nbsp;&middot; -->
-posted on <a href="#" class="date">{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+posted on <a href="#" class="date">{{ post.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% if post.utcmodified().strftime("%Y-%m-%d") != post.utcpublished().strftime("%Y-%m-%d") %}
-last modified on <a href="#" class="date">{{ post.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+&middot;&nbsp;last modified on <a href="#" class="date">{{ post.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% endif %}
 {% if post.tags %}
+<div style="padding-top: 3pt">
 tags:
-{% endif %}
 {% for tag in post.tags %}
-    {% if page.uri() != tag.uri() %}
-        <span><a href="/{{ tag.uri() }}">{{ tag.name() }}</a>  </span>
-    {% else %}
-        <span>{{ tag.name() }}  </span>
-    {% endif %}
+    {% include "_tag.html" %}
 {% endfor %}
+</div>
+{% endif %}
 {{ post.summary() }}

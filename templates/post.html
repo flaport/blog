@@ -3,21 +3,19 @@
 {% block content %}
     <h1>{{ page.title() }}</h1>
 <!-- author: {{ page.author() }}&nbsp;&middot; -->
-posted on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+pageed on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% if page.utcmodified().strftime("%Y-%m-%d") != page.utcpublished().strftime("%Y-%m-%d") %}
-last modified on <a href="#" class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>&nbsp;&middot;
+&middot;&nbsp;last modified on <a href="#" class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% endif %}
 {% if page.tags %}
+<div style="padding-top: 3pt">
 tags:
-{% endif %}
 {% for tag in page.tags %}
-    {% if page.uri() != tag.uri() %}
-        <span><a href="/{{ tag.uri() }}">{{ tag.name() }}</a>  </span>
-    {% else %}
-        <span>{{ tag.name() }}  </span>
-    {% endif %}
+    {% include "_tag.html" %}
 {% endfor %}
-    {{ page.content() }}
+</div>
+{% endif %}
+{{ page.content() }}
 
 <script data-isso="//isso.flaport.net/" src="//isso.flaport.net/js/embed.min.js"></script>
 <style>

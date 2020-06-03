@@ -53,48 +53,61 @@
       <div class="sidebar">
         <div class="sidebarwrapper">
           <h1 class="logo"><a href="/">Flaport.net</a></h1>
-
-          <h3>Blog</h3>
           <ul>
             <li class="toctree-l1">
               <a href="/">Home</a>
             </li>
+            {% if tag %}
+            <li class="toctree-l1">
+                Tag: <a href="/{{ tag.uri() }}">{{ tag.longname() }}</a>
+            </li>
+            {% endif %}
             {% if newest_post %}
             <li class="toctree-l1">
-                <a href="/{{ newest_post.uri() }}">Latest&nbsp;post</a>
+                {% if tag %}
+                <a href="/{{ newest_post.uri() }}">Newest {% include "_shorttag.html" %} Post</a>
+                {% else %}
+                <a href="/{{ newest_post.uri() }}">Newest Post</a>
+                {% endif %}
             </li>
             {% endif %}
             {% if next_post %}
             <li class="toctree-l1">
-                <a href="/{{ next_post.uri() }}">Next&nbsp;(newer)</a>
+                {% if tag %}
+                <a href="/{{ next_post.uri() }}">Newer post</a>
+                {% else %}
+                <a href="/{{ next_post.uri() }}">Newer post</a>
+                {% endif %}
             </li>
             {% endif %}
             {% if previous_post %}
             <li class="toctree-l1">
-                <a href="/{{ previous_post.uri() }}">Previous&nbsp;(older)</a>
+                {% if tag %}
+                <a href="/{{ previous_post.uri() }}">Older post</a>
+                {% else %}
+                <a href="/{{ previous_post.uri() }}">Older post</a>
+                {% endif %}
             </li>
             {% endif %}
-            <li class="toctree-l1">
-                <a href="/index.xml" target="_blank">RSS&nbsp;<span class="fa"></span></a>
-            </li>
             <h3 style="padding-top: 1em;">Tags</h3>
             {% for tag in tags %}
-            <li class="toctree-l1">
-                <a href="/{{ tag.uri() }}">{{ tag.name() }}</a> ({{ tag.num_posts() }})
-            </li>
+                {% include "_tag.html" %}
             {% endfor %}
             <h3 style="padding-top: 1em;">Projects</h3>
             <li class="toctree-l1">
               <a href="https://photontorch.com"
-                >Photontorch</a
+                >Photontorch&nbsp;</a
               >
             </li>
             <li class="toctree-l1">
               <a href="https://github.com/flaport/fdtd"
-                >Python&nbsp;3D&nbsp;FDTD</a
+                >Python&nbsp;3D&nbsp;FDTD&nbsp;</a
               >
             </li>
             <h3 style="padding-top: 1em;">External links</h3>
+            <li class="toctree-l1">
+                <a href="/index.xml" target="_blank">RSS&nbsp;<span class="fa">&nbsp;</span></a>
+            </li>
             <li class="toctree-l1">
               <a href="https://github.com/flaport"
                 >GitHub&nbsp;<span class="fa">&nbsp;</span></a
@@ -112,7 +125,7 @@
             </li>
             <li class="toctree-l1">
               <a href="https://www.photonics.intec.ugent.be/contact/people.asp?ID=424"
-                >Academic&nbsp;Profile</a
+                >Academic&nbsp;Profile&nbsp;</a
               >
             </li>
             <div style="padding-top: 2em;">

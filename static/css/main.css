@@ -8,6 +8,7 @@ div.sidebar {
   margin-left: -100%;
   font-size: 90%;
   word-wrap: break-word;
+  padding: 15px 0 0 0;
   overflow-wrap: break-word;
 }
 
@@ -54,11 +55,11 @@ div.body li {
 }
 
 li > p:first-child {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 li > p:last-child {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .optional {
@@ -77,31 +78,11 @@ span.pre {
   hyphens: none;
 }
 
-a code {
-  background-color: transparent;
-  font-weight: bold;
-}
-
 h1 code,
 h2 code,
 h3 code,
 h4 code {
   background-color: transparent;
-}
-
-@media print {
-  div.document {
-    margin: 0 !important;
-    width: 100%;
-  }
-
-  div.sidebar {
-    display: none;
-  }
-
-  .noprint {
-    display: none;
-  }
 }
 
 body {
@@ -135,22 +116,13 @@ div.content > .section {
   text-align: left;
 }
 
-div.sidebar a {
-  text-decoration: none;
-  border-bottom: 1px dotted #999;
-}
-
-div.sidebar a:hover {
-  border-bottom: 1px solid #999;
-}
-
 div.sidebarwrapper {
   padding: 18px 10px;
 }
 
 div.sidebarwrapper p.logo {
   padding: 0;
-  margin: -10px 0 0 0px;
+  margin: -10px 0 0 0;
   text-align: center;
 }
 
@@ -174,13 +146,6 @@ div.sidebar h4 {
   font-size: 20px;
 }
 
-div.sidebar p.logo a,
-div.sidebar h3 a,
-div.sidebar p.logo a:hover,
-div.sidebar h3 a:hover {
-  border: none;
-}
-
 div.sidebar p {
   margin: 10px 0;
 }
@@ -190,22 +155,10 @@ div.sidebar ul {
   padding: 0;
 }
 
-div.sidebar ul li.toctree-l1 > a {
-  font-size: 120%;
-}
-
 div.sidebar input {
   border: 1px solid #ccc;
   font-family: Georgia, serif;
   font-size: 1em;
-}
-
-a {
-  text-decoration: underline;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 div.content h1,
@@ -214,7 +167,7 @@ div.content h3,
 div.content h4 {
   font-family: Georgia, serif;
   font-weight: normal;
-  margin: 30px 0px 10px 0px;
+  margin: 30px 0 10px 0;
   padding: 0;
 }
 
@@ -261,7 +214,7 @@ ul {
 pre {
   background: #eee;
   padding: 7px 30px;
-  margin: 15px 0px;
+  margin: 15px 0;
   line-height: 1.3em;
 }
 
@@ -270,13 +223,113 @@ li pre {
   padding-left: 30px;
 }
 
-a.reference {
-  text-decoration: none;
-  border-bottom: 1px dotted #004b6b;
+pre {
+  border-style: solid;
+  border-radius: 0;
+  border-width: 0;
+  padding-left: 10pt;
+  padding-right: 10pt;
+  padding-top: 5pt;
+  padding-bottom: 5pt;
+}
+.input {
+  padding-left: 0pt;
+  padding-right: 0pt;
+  padding-top: 0pt;
+  padding-bottom: 0pt;
+}
+.output_wrapper {
+  padding-left: 0pt;
+  padding-right: 0pt;
+  padding-top: 0pt;
+  padding-bottom: 0pt;
+}
+.output {
+  border-style: solid;
+  border-radius: 0;
+  border-width: 0;
+  padding-left: 10pt;
+  padding-right: 10pt;
+  padding-top: 5pt;
+  padding-bottom: 5pt;
+}
+.prompt.input_prompt {
+  display: none;
+}
+.prompt.output_prompt {
+  display: none;
 }
 
-a.reference:hover {
-  border-bottom: 1px solid #6d4100;
+a[target="_blank"] {
+  background: url(/static/img/external-link.svg) center right no-repeat;
+  padding-right: 0.7em;
+}
+a:link {
+  text-decoration: none;
+}
+a:active {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+a.anchor-link {
+  text-decoration: none;
+}
+a.anchor-link:hover {
+  text-decoration: none;
+}
+a.tag {
+  padding: 0px 1px 0px 1px;
+  font-size: 14px;
+}
+a.tag:hover {
+  padding: 0px 0px 0px 0px;
+  font-size: 14px;
+}
+span.currenttag {
+  padding: 0px 1px 0px 1px;
+  font-size: 14px;
+}
+span.currenttag:hover {
+  cursor: default;
+  padding: 0px 1px 0px 1px;
+  font-size: 14px;
+}
+.tooltip {
+  position: relative;
+}
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  text-align: center;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: 0px;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+@media print {
+  div.document {
+    margin: 0 !important;
+    width: 100%;
+  }
+
+  div.sidebar {
+    display: none;
+  }
+
+  .noprint {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 800px) {
@@ -289,8 +342,8 @@ a.reference:hover {
     display: block;
     float: none;
     width: 100%;
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
     background: var(--color8);
   }
 
@@ -311,46 +364,4 @@ a.reference:hover {
   div.content {
     margin: 0 10px 0 10px;
   }
-}
-
-pre {
-  border-style: solid;
-  border-radius: 0px;
-  border-width: 0px;
-  padding-left: 10pt;
-  padding-right: 10pt;
-  padding-top: 5pt;
-  padding-bottom: 5pt;
-}
-.input {
-  padding-left: 0pt;
-  padding-right: 0pt;
-  padding-top: 0pt;
-  padding-bottom: 0pt;
-}
-.output_wrapper {
-  padding-left: 0pt;
-  padding-right: 0pt;
-  padding-top: 0pt;
-  padding-bottom: 0pt;
-}
-.output {
-  border-style: solid;
-  border-radius: 0px;
-  border-width: 0px;
-  padding-left: 10pt;
-  padding-right: 10pt;
-  padding-top: 5pt;
-  padding-bottom: 5pt;
-}
-.prompt.input_prompt {
-  display: none;
-}
-.prompt.output_prompt {
-  display: none;
-}
-a[href*="://"]
-{
-  background: url(/static/img/external-link.svg) center right no-repeat;
-  padding-right: 0.7em;
 }

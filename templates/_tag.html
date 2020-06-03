@@ -1,0 +1,5 @@
+{% if page.uri() != tag.uri() %}
+<a class="tag tooltip" href="/{{ tag.uri() }}">{{ tag.name().replace(' ', '&nbsp;') }}<sup>&nbsp;({{ tag.num_posts() }})</sup><span class="tooltiptext">{{ tag.longname().replace(' ', '&nbsp;') }}</span></a>
+{% else %}
+<span class="currenttag tooltip">{{ tag.longname().replace(' ', '&nbsp;') }}<sup>&nbsp;({{ tag.num_posts() }})</sup></span>
+{% endif %}
