@@ -371,7 +371,7 @@ class Tag:
         for post in self.posts:
             post.tags = sorted(post.tags, key=lambda x: (-x.num_posts(), x.name()))
         os.makedirs(HTMLDIR/TAGDIR/self.name())
-        symbolic_link(STATICDIR, HTMLDIR/TAGDIR/self.name())
+        symbolic_link(HTMLDIR/STATICDIR, HTMLDIR/TAGDIR/self.name())
     def render(self, index=None, **kwargs):
         html = self._template.render(page=self, index=index, tag=self, newest_post=self.posts[0], **kwargs)
         num_posts = len(self.posts)
@@ -516,7 +516,7 @@ def command_clean(args: Namespace):
 def command_init(args: Namespace):
     for directory in (HTMLDIR, TAGDIR, POSTDIR, STATICDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
         os.makedirs(directory, exist_ok=True)
-    symbolic_link(STATICDIR, HTMLDIR)
+    copy_folder(STATICDIR, HTMLDIR)
     symbolic_link(STATICDIR, POSTDIR)
 
 def command_publish(args: Namespace):
