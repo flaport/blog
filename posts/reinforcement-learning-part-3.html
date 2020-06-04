@@ -1,9 +1,7 @@
 <h1> Play tic-tac-toe against a reinforcement agent </h1>
-<p> I finally got around on making an unbeatable tic-tac-toe game. Based of
-course on
-<a href="/reinforcement-learning-part-1.html">RL part 1</a> and
-<a href="/reinforcement-learning-part-2.html">RL part 2</a>.
-Have fun! </p>
+<p> I finally made an unbeatable tic-tac-toe game in javascript using the
+qtable obtained in in the <a href="/reinforcement-learning-part-1.html">first
+reinforcement learning post</a>. Have Fun going for the tie! </p>
 
 <style>
 .ttt-wrapper {
@@ -37,29 +35,43 @@ Have fun! </p>
   font-size: 24px;
   background-color: #ff000088;
 }
+#ttt-msg {
+  font-size: 24px;
+  color: #000000ff;
+}
 .emoji {
   padding-top: 10px;
   font-size: 40px;
 }
 </style>
 
-    <div class="ttt-wrapper">
-        <div class="ttt-grid">
-            <div class="ttt-cell" id="ttt-1"></div>
-            <div class="ttt-cell" id="ttt-2"></div>
-            <div class="ttt-cell" id="ttt-3"></div>
-            <div class="ttt-cell" id="ttt-4"></div>
-            <div class="ttt-cell" id="ttt-5"></div>
-            <div class="ttt-cell" id="ttt-6"></div>
-            <div class="ttt-cell" id="ttt-7"></div>
-            <div class="ttt-cell" id="ttt-8"></div>
-            <div class="ttt-cell" id="ttt-9"></div>
-            <div class="ttt-cell" id="ttt-a">Player O<div class="emoji" id="ttt-playerO">🤓</div></div>
-            <div class="ttt-cell" id="ttt-b">Player X<div class="emoji" id="ttt-playerX">🤖</div></div>
-            <div class="ttt-cell" id="ttt-c">Restart<div class="emoji">↩</div></div>
-        </div>
+
+<h2 id="Game">Game<a class="anchor-link" href="#Game">&#182;</a></h2>
+
+<div class="ttt-wrapper">
+    <div class="ttt-grid">
+        <div class="ttt-cell" id="ttt-1"></div>
+        <div class="ttt-cell" id="ttt-2"></div>
+        <div class="ttt-cell" id="ttt-3"></div>
+        <div class="ttt-cell" id="ttt-4"></div>
+        <div class="ttt-cell" id="ttt-5"></div>
+        <div class="ttt-cell" id="ttt-6"></div>
+        <div class="ttt-cell" id="ttt-7"></div>
+        <div class="ttt-cell" id="ttt-8"></div>
+        <div class="ttt-cell" id="ttt-9"></div>
+        <div class="ttt-cell" id="ttt-a">Player O<div class="emoji" id="ttt-playerO">🤓</div></div>
+        <div class="ttt-cell" id="ttt-b">Player X<div class="emoji" id="ttt-playerX">🤖</div></div>
+        <div class="ttt-cell" id="ttt-c">Restart<div class="emoji">↩</div></div>
     </div>
-    <div id="ttt-msg">Player O's turn</div>
+    <span id="ttt-msg">Player O's turn</span>
+</div>
+
+<h2 id="Index">Index<a class="anchor-link" href="#Index">&#182;</a></h2><ul>
+<li><a href="/reinforcement-learning-part-1.html">part 1</a>: We create the game environment and a simple unbeatable AI based on <em>traditional</em> Q-learning 🤖.</li>
+<li><a href="/reinforcement-learning-part-2.html">part 2</a>: We modify our AI to utilize a neural network: <em>deep</em> Q-learning 👾.</li>
+<li><a href="/reinforcement-learning-part-3.html">part 3</a>: Have some fun and play against the Q-agent 🤓.</li>
+</ul>
+
 <script>
 // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-3.0"
 var arr = [0, 0, 0, 0, 0, 0, 0, 0, 0];
