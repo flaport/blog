@@ -46,6 +46,9 @@ a:link {
   color: var(--color15);
   border-bottom: 1px dotted var(--color15);
 }
+h1 a:link {
+  border-bottom: 0px dotted var(--color15);
+}
 a:active {
   color: var(--color1);
   border-bottom: 1px solid var(--color1);
