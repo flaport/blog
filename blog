@@ -370,7 +370,8 @@ class Tag:
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
         for post in self.posts:
             post.tags = sorted(post.tags, key=lambda x: (-x.num_posts(), x.name()))
-        os.makedirs(HTMLDIR/TAGDIR/self.name())
+        if not os.path.isdir(HTMLDIR/TAGDIR/self.name()):
+            os.makedirs(HTMLDIR/TAGDIR/self.name())
         symbolic_link(HTMLDIR/STATICDIR, HTMLDIR/TAGDIR/self.name())
     def render(self, index=None, **kwargs):
         html = self._template.render(page=self, index=index, tag=self, newest_post=self.posts[0], **kwargs)
