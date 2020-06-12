@@ -402,7 +402,7 @@ class Tag:
         return 0.60
     @cache()
     def utcmodified(self) -> datetime:
-        return sorted(post.utcmodified() for post in self.posts)[0]
+        return sorted(post.utcmodified() for post in self.posts)[-1]
     @cache()
     def num_posts(self) -> int:
         return int(len(self.posts))
@@ -491,7 +491,7 @@ class Index:
         return 1.0
     @cache()
     def utcmodified(self) -> datetime:
-        return sorted(post.utcmodified() for post in self.posts)[0]
+        return sorted(post.utcmodified() for post in self.posts)[-1]
     @cache()
     def num_posts(self) -> int:
         return int(len(self.posts))
