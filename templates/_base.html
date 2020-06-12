@@ -8,9 +8,18 @@
     {% if page.title() %}
     <title>Flaport.net | {{ page.title() }}</title>
     {% else %}
-    <title>Flaport.net</title>
+    <title>Flaport.net | Linux & Machine Learning </title>
+    {% endif %}
+    {% if page.textsummary() %}
+    <meta name="description" content="{{ page.textsummary() }}">
+    {% else %}
+    <meta name="description" content="I write some stuff down once in a while. Mostly about desktop linux and machine learning.">
     {% endif %}
     <link rel="shortcut icon" type="image/svg" href="/static/img/icon.svg" />
+    <link rel="stylesheet" href="/static/css/normalize.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/fonts.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/main.css" type="text/css" />
+    <link rel="stylesheet" href="/static/css/colors.css" type="text/css" />
     {% if vega %}
     <script src="/static/js/vega.js"></script>
     <script src="/static/js/vega-lite.js"></script>
@@ -186,10 +195,14 @@
               >
             </li>
             <li class="toctree-l1">
-              <span class="fa" style="font-size: 80%;"></span>&nbsp;<a
+              <span class="fa" style="font-size: 72%;"></span>&nbsp;<a
                 href="https://www.photonics.intec.ugent.be/contact/people.asp?ID=424"
                 >Academic&nbsp;Profile</a
               >
+            </li>
+            <li class="toctree-l1">
+              <span class="fa" style="font-size: 72%;"></span>
+              &nbsp;<a href="/sitemap.xml">Sitemap</a>
             </li>
             <div style="padding-top: 2em;">
               <span class="fa"></span> Floris Laporte 2020
@@ -205,10 +218,6 @@
         </div>
       </div>
     </div>
-    <link rel="stylesheet" href="/static/css/normalize.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/fonts.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/main.css" type="text/css" />
-    <link rel="stylesheet" href="/static/css/colors.css" type="text/css" />
     <script src="/static/js/localdates.js"></script>
     <script src="/static/js/externallinks.js"></script>
     <script src="/static/js/toggledarkmode.js"></script>

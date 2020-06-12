@@ -123,6 +123,9 @@ class Post:
             lines = file.read().split("\n")
         return lines
     @cache()
+    def priority(self) -> float:
+        return 0.85
+    @cache()
     def author(self) -> str:
         author = subprocess.check_output(['git', 'log', '--pretty=format:%an%x09', self.path]).decode().split("\n")[0].strip()
         if not author:
@@ -172,7 +175,7 @@ class Post:
     @cache()
     def textsummary(self) -> str:
         summary = self.summary()
-        return re.sub("<.*?>", "", summary)
+        return re.sub("<.*?>", "", summary).strip()
     @cache()
     def title(self) -> str:
         title = re.sub("^[ ]*[#]*[ ]*", "", self.lines[0])
@@ -395,6 +398,12 @@ class Tag:
         with open(HTMLDIR/self.uri()/"index.html", "w") as file:
             print(html, file=file)
     @cache()
+    def priority(self) -> float:
+        return 0.60
+    @cache()
+    def utcmodified(self) -> datetime:
+        return sorted(post.utcmodified() for post in self.posts)[0]
+    @cache()
     def num_posts(self) -> int:
         return int(len(self.posts))
     @cache()
@@ -416,10 +425,20 @@ class Tag:
         if name == longname:
             return name.capitalize()
         return f"{longname.capitalize()} [{name.upper()}]"
+    @cache()
+    def summary(self) -> str:
+        return ""
+    @cache()
+    def textsummary(self) -> str:
+        return ""
 
 class Index:
     _template = get_template("index.html")
     _xmltemplate = get_template("index.xml")
+    _sitemaptemplate = get_template("sitemap.xml")
+    _bingverification = "BingSiteAuth.xml"
+    _googleverification = "googlefb30e5afe41cb0d2.html"
+    _yandexverification = "yandex_d77fd905780b76f1.html"
     def __init__(self):
         self.posts, self.tags = [], []
         for post_path in POSTDIR.glob("*"):
@@ -440,6 +459,10 @@ class Index:
     def render(self, **kwargs):
         html = self._template.render(page=self, index=self, newest_post=self.posts[0], **kwargs)
         xml = self._xmltemplate.render(page=self, index=self, date=datetime.utcnow(), **kwargs)
+        sitemap = self._sitemaptemplate.render(pages=[self, *self.posts, *self.tags])
+        bingverification = get_template(self._bingverification).render()
+        googleverification = get_template(self._googleverification).render()
+        yandexverification = get_template(self._yandexverification).render()
         num_posts = len(self.posts)
         print("\nposts:\n------")
         for i, post in enumerate(self.posts):
@@ -455,6 +478,20 @@ class Index:
             print(html, file=file)
         with open(f"{HTMLDIR/self.uri()[:-5]}.xml", "w") as file:
             print(xml, file=file)
+        with open(f"{HTMLDIR/'sitemap.xml'}", "w") as file:
+            print(sitemap, file=file)
+        with open(f"{HTMLDIR/self._bingverification}", "w") as file:
+            print(bingverification, file=file)
+        with open(f"{HTMLDIR/self._googleverification}", "w") as file:
+            print(googleverification, file=file)
+        with open(f"{HTMLDIR/self._yandexverification}", "w") as file:
+            print(yandexverification, file=file)
+    @cache()
+    def priority(self) -> float:
+        return 1.0
+    @cache()
+    def utcmodified(self) -> datetime:
+        return sorted(post.utcmodified() for post in self.posts)[0]
     @cache()
     def num_posts(self) -> int:
         return int(len(self.posts))
@@ -463,6 +500,12 @@ class Index:
         return "index"
     @cache()
     def title(self) -> str:
+        return ""
+    @cache()
+    def summary(self) -> str:
+        return ""
+    @cache()
+    def textsummary(self) -> str:
         return ""
     @cache()
     def uri(self) -> str:
