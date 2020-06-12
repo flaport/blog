@@ -13,9 +13,11 @@ if (currentTheme) {
 function switchTheme(e) {
   if (e.target.checked) {
     document.documentElement.setAttribute("data-theme", "dark");
+    document.getElementById("logo").src = "/static/img/logo-white.svg";
     localStorage.setItem("theme", "dark");
   } else {
     document.documentElement.setAttribute("data-theme", "light");
+    document.getElementById("logo").src = "/static/img/logo.svg";
     localStorage.setItem("theme", "light");
   }
 }
