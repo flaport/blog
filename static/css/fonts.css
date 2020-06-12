@@ -1,30 +1,37 @@
 @font-face {
   font-family: "Sans";
   src: url("/static/fonts/LinBiolinum_Rah.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "SansBold";
   src: url("/static/fonts/LinBiolinum_RBah.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "SansItalic";
   src: url("/static/fonts/LinBiolinum_RIah.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "Mono";
   src: url("/static/fonts/FiraCode-Regular.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "MonoBold";
   src: url("/static/fonts/FiraCode-SemiBold.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "MonoItalic";
   src: url("/static/fonts/FiraCode-Light.ttf");
+  font-display: swap;
 }
 @font-face {
   font-family: "FontAwesome";
   src: url("/static/fonts/fontawesome-regular.ttf");
+  font-display: swap;
 }
 .fa {
   font-family: FontAwesome;

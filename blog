@@ -36,6 +36,7 @@ EXTS: Dict[str, str] = {
     ".ipynb": "NotebookPost",
     ".html": "HtmlPost",
 }
+MATHJAX_PATTERNS = [r"\\begin\{align\*?\}", r"\$[^$]*\$"]
 
 ## Decorators
 cache = partial(lru_cache, None, True)
@@ -181,9 +182,24 @@ class NotebookPost(Post):
     def __init__(self, path: Path):
         super().__init__(path)
         self.json = self.readjson()
+        self.mathjax = self._needs_mathjax(self.json)
         self._replace_raw_cell_by_markdown_cell(self.json)
         self.plotly_plots, self.vega_plots = self._patch_json_for_interactive_plots(self.json)
         self.lines = self.readlines()
+    def readjson(self) -> Dict:
+        with open(self.path, "r") as file:
+            dic = json.load(file)
+        return dic
+    @staticmethod
+    def _needs_mathjax(dic: Dict) -> bool:
+        for cell in dic["cells"]:
+            if not cell['cell_type'] == 'markdown':
+                continue
+            content = " ".join(cell["source"]).replace("\n", " ")
+            for pattern in MATHJAX_PATTERNS:
+                if re.search(pattern, content):
+                    return True
+        return False
     @staticmethod
     def _patch_json_for_interactive_plots(dic: Dict) -> Dict[str, str]:
         vega = ('<div id="vis{id}"></div>\n'
@@ -221,10 +237,6 @@ class NotebookPost(Post):
                     elif 'plotly' in key:
                         plotly_plots['{{ %s }}'%id] = plotly.format(id=id, spec=json.dumps(data[key]))
         return plotly_plots, vega_plots
-    def readjson(self) -> Dict:
-        with open(self.path, "r") as file:
-            dic = json.load(file)
-        return dic
     @staticmethod
     def _replace_raw_cell_by_markdown_cell(dic: Dict):
         for cell in dic['cells']:
@@ -298,7 +310,7 @@ class NotebookPost(Post):
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
     def render(self, index=None, tag=None, **kwargs):
-        html = self._template.render(page=self, index=index, tag=tag, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
+        html = self._template.render(page=self, index=index, tag=tag, mathjax=self.mathjax, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
         html = self._patch_html_for_plotly(html)
         html = self._patch_html_for_vega(html)
         html = self._patch_js_license_in_html(html)
