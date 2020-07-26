@@ -2,6 +2,8 @@
 
 ## Imports
 
+from __future__ import annotations
+
 import os
 import io
 import re
@@ -17,7 +19,7 @@ import socketserver
 from pathlib import Path
 from datetime import datetime, timedelta
 from functools import partial, lru_cache
-from typing import Dict, Tuple, List, Callable
+from typing import Dict, Tuple, List, Callable, Optional
 from argparse import ArgumentParser, Namespace
 
 from jinja2 import Template, Environment, FileSystemLoader
@@ -43,10 +45,10 @@ cache = partial(lru_cache, None, True)
 
 ## Functions
 
-def symbolic_link(src: Path, dest: Path):
+def symbolic_link(src: Path, dest: Path) -> None:
     subprocess.check_output(["ln", "-srf", src, dest])
 
-def copy_folder(src: Path, dest: Path):
+def copy_folder(src: Path, dest: Path) -> None:
     shutil.rmtree(dest/src, ignore_errors=True)
     shutil.copytree(src, dest/src, symlinks=False, ignore_dangling_symlinks=True)
 
@@ -95,27 +97,27 @@ def ipynb2html(content: str) -> str:
 ## Classes
 
 class Post:
-    _posts: Dict[Path, 'Post'] = {}
-    _template = get_template("post.html")
-    def __new__(cls, path: Path):
+    _posts: Dict[Path, Post] = {}
+    _template: Template = get_template("post.html")
+    def __new__(cls, path: Path) -> Post:
         if path in cls._posts:
             return cls._posts[path]
         return super().__new__(cls)
-    def __init__(self, path: Path):
+    def __init__(self, path: Path) -> None:
         if path in self._posts:
             return
         self.path = Path(path)
         self.tags: List[Tag] = []
         self._posts[path] = self
         self.lines = self.readlines()
-    def save_html(self, html, tag=None):
+    def save_html(self, html: str, tag:Optional[Tag]=None) -> None:
         if tag:
             filename = HTMLDIR/f"{tag.uri()}{self.uri()}"
         else:
             filename = HTMLDIR/self.uri()
         with open(filename, "w") as file:
             print(html, file=file)
-    def render(self, index=None, tag=None, **kwargs):
+    def render(self, index:Optional[Index]=None, tag:Optional[Tag]=None, **kwargs) -> None:
         html = self._template.render(page=self, index=index, tag=tag, **kwargs)
         self.save_html(html, tag=tag)
     def readlines(self) -> List[str]:
@@ -182,7 +184,7 @@ class Post:
         return title
 
 class NotebookPost(Post):
-    def __init__(self, path: Path):
+    def __init__(self, path: Path) -> None:
         super().__init__(path)
         self.json = self.readjson()
         self.mathjax = self._needs_mathjax(self.json)
@@ -205,7 +207,7 @@ class NotebookPost(Post):
                     return True
         return False
     @staticmethod
-    def _patch_json_for_interactive_plots(dic: Dict) -> Dict[str, str]:
+    def _patch_json_for_interactive_plots(dic: Dict) -> Tuple[Dict[str, str],Dict[str, str]]:
         vega = ('<div id="vis{id}"></div>\n'
                 '<script type="text/javascript">\n'
                 'var spec = {spec}\n'
@@ -242,20 +244,19 @@ class NotebookPost(Post):
                         plotly_plots['{{ %s }}'%id] = plotly.format(id=id, spec=json.dumps(data[key]))
         return plotly_plots, vega_plots
     @staticmethod
-    def _replace_raw_cell_by_markdown_cell(dic: Dict):
+    def _replace_raw_cell_by_markdown_cell(dic: Dict) -> None:
         for cell in dic['cells']:
             if cell['cell_type'] == 'raw':
                 cell['cell_type'] = 'markdown'
                 cell['source'] = ['\n```python\n',*cell['source'],'\n```\n']
     @staticmethod
-    def _delete_marked_codecells(dic: Dict):
+    def _delete_marked_codecells(dic: Dict) -> None:
         delete_idxs = []
         for idx, cell in enumerate(dic['cells']):
             if cell['cell_type'] == 'code' and cell["source"][0].strip() == "#!":
                 delete_idxs.append(idx)
         for idx in reversed(delete_idxs):
             del dic["cells"][idx]
-
     def _patch_html_for_plotly(self, html: str) -> str:
         # update html with saved key value pairs
         for k, v in self.plotly_plots.items():
@@ -322,7 +323,7 @@ class NotebookPost(Post):
     @cache()
     def content(self) -> str:
         return ipynb2html(json.dumps(self.json))
-    def render(self, index=None, tag=None, **kwargs):
+    def render(self, index:Optional[Index]=None, tag:Optional[Tag]=None, **kwargs) -> None:
         html = self._template.render(page=self, index=index, tag=tag, mathjax=self.mathjax, vega=bool(self.vega_plots), plotly=bool(self.plotly_plots), **kwargs)
         html = self._patch_html_for_plotly(html)
         html = self._patch_html_for_vega(html)
@@ -348,7 +349,7 @@ class MarkdownPost(NotebookPost):
         return dic
 
 class HtmlPost(Post):
-    def render(self, index=None, tag=None, **kwargs):
+    def render(self, index:Optional[Index]=None, tag:Optional[Tag]=None, **kwargs) -> None:
         html = self._template.render(page=self, index=index, tag=tag, **kwargs)
         self.save_html(html, tag=tag)
     def readlines(self) -> List[str]:
@@ -369,13 +370,13 @@ class HtmlPost(Post):
         return self.lines[0].split("<h1>")[1].split("</h1>")[0]
 
 class Tag:
-    _tags: Dict[Path, 'Tag'] = {}
-    _template = get_template("tag.html")
-    def __new__(cls, path: Path):
+    _tags: Dict[Path, Tag] = {}
+    _template: Template = get_template("tag.html")
+    def __new__(cls, path: Path) -> Tag:
         if path in cls._tags:
             return cls._tags[path]
         return super().__new__(cls)
-    def __init__(self, path: Path):
+    def __init__(self, path: Path) -> None:
         if path in self._tags:
             return
         self.path = Path(path)
@@ -398,7 +399,7 @@ class Tag:
         if not os.path.isdir(HTMLDIR/TAGDIR/self.name()):
             os.makedirs(HTMLDIR/TAGDIR/self.name())
         symbolic_link(HTMLDIR/STATICDIR, HTMLDIR/TAGDIR/self.name())
-    def render(self, index=None, **kwargs):
+    def render(self, index: Optional[Index]=None, **kwargs) -> None:
         html = self._template.render(page=self, index=index, tag=self, newest_post=self.posts[0], **kwargs)
         num_posts = len(self.posts)
         for i, post in enumerate(self.posts):
@@ -443,13 +444,13 @@ class Tag:
         return ""
 
 class Index:
-    _template = get_template("index.html")
-    _xmltemplate = get_template("index.xml")
-    _sitemaptemplate = get_template("sitemap.xml")
-    _bingverification = "BingSiteAuth.xml"
-    _googleverification = "googlefb30e5afe41cb0d2.html"
-    _yandexverification = "yandex_d77fd905780b76f1.html"
-    def __init__(self):
+    _template: Template = get_template("index.html")
+    _xmltemplate: Template = get_template("index.xml")
+    _sitemaptemplate: Template = get_template("sitemap.xml")
+    _bingverification: str = "BingSiteAuth.xml"
+    _googleverification: str = "googlefb30e5afe41cb0d2.html"
+    _yandexverification: str = "yandex_d77fd905780b76f1.html"
+    def __init__(self) -> None:
         self.posts, self.tags = [], []
         for post_path in POSTDIR.glob("*"):
             if post_path.is_dir():
@@ -466,7 +467,7 @@ class Index:
             self.tags.append(Tag(tag_path))
         self.tags = sorted(self.tags, key=lambda x: (-x.num_posts(), x.name()))
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
-    def render(self, **kwargs):
+    def render(self, **kwargs) -> None:
         html = self._template.render(page=self, index=self, newest_post=self.posts[0], **kwargs)
         xml = self._xmltemplate.render(page=self, index=self, date=datetime.utcnow(), **kwargs)
         sitemap = self._sitemaptemplate.render(pages=[self, *self.posts, *self.tags])
@@ -569,32 +570,30 @@ def parse_serve(args: List[str]) -> Namespace:
 
 ## Commands
 
-def command_build(args: Namespace):
+def command_build(args: Namespace) -> None:
     command_init(args)
     index = Index()
     index.render()
 
-def command_clean(args: Namespace):
+def command_clean(args: Namespace) -> None:
     for directory in (HTMLDIR, HTMLDIR/TAGDIR):
         shutil.rmtree(directory, ignore_errors=True)
     command_init(args)
 
-def command_init(args: Namespace):
+def command_init(args: Namespace) -> None:
     for directory in (HTMLDIR, TAGDIR, POSTDIR, STATICDIR, TEMPLATEDIR, HTMLDIR/TAGDIR):
         os.makedirs(directory, exist_ok=True)
     copy_folder(STATICDIR, HTMLDIR)
     symbolic_link(STATICDIR, POSTDIR)
 
-def command_publish(args: Namespace):
+def command_publish(args: Namespace) -> None:
     destination = args.destination
     if not destination.endswith("/"):
         destination = destination + "/"
-    exit_code = subprocess.call(["rsync", "-avP", "--delete", "./", args.destination])
-    if exit_code:
-        raise subprocess.CalledProcessError(f"rsync exited with exit code {exit_code}")
+    subprocess.check_output(["rsync", "-avP", "--delete", "./", args.destination])
     print("\nblog published.")
 
-def command_serve(args: Namespace):
+def command_serve(args: Namespace) -> None:
     if not args.no_fork:
         newargs = ["python", __file__, *args.orig_args, "--no-fork"]
         with open(os.devnull, "w") as file:
@@ -608,7 +607,7 @@ def command_serve(args: Namespace):
 
 ## Main
 
-def main(args: List[str]):
+def main(args: List[str]) -> None:
     if Path(".").absolute() != Path(__file__).parents[0].absolute():
         raise RuntimeError("Run `blog` from the root folder: `./blog`")
     parsed_args = parse_args(sys.argv[1:])
