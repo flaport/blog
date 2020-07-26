@@ -1,0 +1,8 @@
+static/js/plotly-latest.js linguist-vendored
+static/js/plotly-latest.min.js linguist-vendored
+static/js/tex-mml-chtml.js linguist-vendored
+static/js/vega.js linguist-vendored
+static/js/vega-lite.js linguist-vendored
+static/js/vega-embed.js linguist-vendored
+static/fonts/* linguist-vendored
+html/* linguist-generated
