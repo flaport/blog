@@ -187,6 +187,7 @@ class NotebookPost(Post):
         self.json = self.readjson()
         self.mathjax = self._needs_mathjax(self.json)
         self._replace_raw_cell_by_markdown_cell(self.json)
+        self._delete_marked_codecells(self.json)
         self.plotly_plots, self.vega_plots = self._patch_json_for_interactive_plots(self.json)
         self.lines = self.readlines()
     def readjson(self) -> Dict:
@@ -246,6 +247,15 @@ class NotebookPost(Post):
             if cell['cell_type'] == 'raw':
                 cell['cell_type'] = 'markdown'
                 cell['source'] = ['\n```python\n',*cell['source'],'\n```\n']
+    @staticmethod
+    def _delete_marked_codecells(dic: Dict):
+        delete_idxs = []
+        for idx, cell in enumerate(dic['cells']):
+            if cell['cell_type'] == 'code' and cell["source"][0].strip() == "#!":
+                delete_idxs.append(idx)
+        for idx in reversed(delete_idxs):
+            del dic["cells"][idx]
+
     def _patch_html_for_plotly(self, html: str) -> str:
         # update html with saved key value pairs
         for k, v in self.plotly_plots.items():
