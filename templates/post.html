@@ -7,6 +7,7 @@ posted on <a href="#" class="date">{{ page.utcpublished().strftime("%Y-%m-%dT%H:
 {% if page.utcmodified().strftime("%Y-%m-%d") != page.utcpublished().strftime("%Y-%m-%d") %}
 &middot;&nbsp;last modified on <a href="#" class="date">{{ page.utcmodified().strftime("%Y-%m-%dT%H:%M:%SZ") }}</a>
 {% endif %}
+&middot;&nbsp;view page on <a href="https://github.com/flaport/blog/blob/master/posts/{{ page.name() }}{{ page.ext() }}">GitHub</a>
 {% if page.tags %}
 <div style="padding-top: 3pt">
 tags:
@@ -16,6 +17,10 @@ tags:
 </div>
 {% endif %}
 {{ page.content() }}
+
+<br>
+<hr>
+If you like this post, consider leaving a comment or <a href="https://github.com/flaport/blog/blob/master/posts/{{ page.name() }}{{ page.ext() }}">star it on GitHub</a>.
 
 <script data-isso="//isso.flaport.net/" src="//isso.flaport.net/js/embed.min.js"></script>
 <style>

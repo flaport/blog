@@ -156,6 +156,9 @@ class Post:
     def name(self) -> str:
         return str(self.path.relative_to(POSTDIR).stem)
     @cache()
+    def ext(self) -> str:
+        return os.path.splitext(self.path)[1]
+    @cache()
     def uri(self) -> str:
         return f"{self.name()}.html"
     @cache()
