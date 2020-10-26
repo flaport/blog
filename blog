@@ -595,8 +595,26 @@ def command_build(args: Namespace) -> None:
     index.render()
 
 def command_clean(args: Namespace) -> None:
-    for directory in (HTMLDIR, HTMLDIR/TAGDIR):
-        shutil.rmtree(directory, ignore_errors=True)
+    for folder in (HTMLDIR, HTMLDIR/TAGDIR):
+        shutil.rmtree(folder, ignore_errors=True)
+    with open(".gitignore", "r") as file:
+        lines = file.readlines()
+    for line in lines:
+        line = line.strip()
+        if line.endswith("/"):
+            line = line[:-1]
+        if not line:
+            continue
+        for root, folders, files in os.walk("."):
+            if root.startswith("./.git"):
+                continue
+            for folder in folders:
+                folder = os.path.join(root, folder)
+                if os.path.exists(folder) and folder.endswith(line):
+                    shutil.rmtree(folder, ignore_errors=True)
+            for file in files:
+                if os.path.exists(file) and file.endswith(line):
+                    os.remove(file)
     command_init(args)
 
 def command_init(args: Namespace) -> None:
