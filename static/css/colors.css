@@ -99,14 +99,6 @@ span.currenttag:hover {
   background: var(--color0);
   border-color: var(--color0);
 }
-.highlight .ge {
-  /* Generic.Emph */
-  font-family: MonoItalic;
-}
-.highlight .gs {
-  /* Generic.Strong */
-  font-family: MonoBold;
-}
 .highlight .hll {
   background-color: var(--color1);
 }
@@ -125,12 +117,10 @@ span.currenttag:hover {
 .highlight .gh {
   /* Generic.Heading */
   color: var(--color1);
-  font-family: MonoBold;
 }
 .highlight .gp {
   /* Generic.Prompt */
   color: var(--color1);
-  font-family: MonoBold;
 }
 .highlight .gt {
   /* Generic.Traceback */
@@ -179,7 +169,6 @@ span.currenttag:hover {
 .highlight .gu {
   /* Generic.Subheading */
   color: var(--color1);
-  font-family: MonoBold;
 }
 .highlight .kt {
   /* Keyword.Type */
@@ -204,7 +193,6 @@ span.currenttag:hover {
 .highlight .ni {
   /* Name.Entity */
   color: var(--color1);
-  font-family: MonoBold;
 }
 .highlight .nl {
   /* Name.Label */
@@ -249,22 +237,18 @@ span.currenttag:hover {
 .highlight .ow {
   /* Operator.Word */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .k {
   /* Keyword */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .kc {
   /* Keyword.Constant */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .kd {
   /* Keyword.Declaration */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .kp {
   /* Keyword.Pseudo */
@@ -273,12 +257,10 @@ span.currenttag:hover {
 .highlight .kr {
   /* Keyword.Reserved */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .nt {
   /* Name.Tag */
   color: var(--color2);
-  font-family: MonoBold;
 }
 .highlight .gr {
   /* Generic.Error */
@@ -287,7 +269,6 @@ span.currenttag:hover {
 .highlight .ne {
   /* Name.Exception */
   color: var(--color3);
-  font-family: MonoBold;
 }
 .highlight .nf {
   /* Name.Function */
@@ -312,7 +293,6 @@ span.currenttag:hover {
 .highlight .nc {
   /* Name.Class */
   color: var(--color4);
-  font-family: MonoBold;
 }
 .highlight .bp {
   /* Name.Builtin.Pseudo */
@@ -321,7 +301,6 @@ span.currenttag:hover {
 .highlight .kn {
   /* Keyword.Namespace */
   color: var(--color5);
-  font-family: MonoBold;
 }
 .highlight .sa {
   /* Literal.String.Affix */
@@ -342,7 +321,6 @@ span.currenttag:hover {
 .highlight .sd {
   /* Literal.String.Doc */
   color: var(--color5);
-  font-family: MonoItalic;
 }
 .highlight .s2 {
   /* Literal.String.Double */
@@ -351,7 +329,6 @@ span.currenttag:hover {
 .highlight .se {
   /* Literal.String.Escape */
   color: var(--color5);
-  font-family: MonoBold;
 }
 .highlight .sh {
   /* Literal.String.Heredoc */
@@ -360,7 +337,6 @@ span.currenttag:hover {
 .highlight .si {
   /* Literal.String.Interpol */
   color: var(--color5);
-  font-family: MonoBold;
 }
 .highlight .sr {
   /* Literal.String.Regex */
@@ -373,32 +349,26 @@ span.currenttag:hover {
 .highlight .c {
   /* Comment */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 .highlight .ch {
   /* Comment.Hashbang */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 .highlight .cm {
   /* Comment.Multiline */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 .highlight .cpf {
   /* Comment.PreprocFile */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 .highlight .c1 {
   /* Comment.Single */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 .highlight .cs {
   /* Comment.Special */
   color: var(--color6);
-  font-family: MonoItalic;
 }
 
 @media screen and (max-width: 800px) {

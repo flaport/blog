@@ -75,8 +75,6 @@ h4 code {
 }
 
 body {
-  font-family: Georgia, serif;
-  font-size: 17px;
   margin: 0;
   padding: 0;
 }
@@ -122,9 +120,6 @@ div.sidebarwrapper h1.logo {
 }
 
 div.sidebar h3 {
-  font-family: Georgia, serif;
-  font-size: 24px;
-  font-weight: normal;
   margin: 0 0 5px 0;
   padding: 0;
 }
@@ -142,8 +137,6 @@ div.content h1,
 div.content h2,
 div.content h3,
 div.content h4 {
-  font-family: Georgia, serif;
-  font-weight: normal;
   margin: 30px 0 10px 0;
   padding: 0;
 }
@@ -151,28 +144,11 @@ div.content h4 {
 div.content h1 {
   margin-top: 0;
   padding-top: 0;
-  font-size: 240%;
-}
-div.content h2 {
-  font-size: 180%;
-}
-div.content h3 {
-  font-size: 150%;
-}
-div.content h4 {
-  font-size: 130%;
 }
 
 div.content p,
 div.content li {
   line-height: 1.4em;
-}
-
-pre,
-code {
-  font-family: "Consolas", "Menlo", "DejaVu Sans Mono",
-    "Bitstream Vera Sans Mono", monospace;
-  font-size: 0.9em;
 }
 
 ul {
@@ -256,20 +232,16 @@ a.anchor-link:hover {
 }
 a.tag {
   padding: 0px 1px 0px 1px;
-  font-size: 15px;
 }
 a.tag:hover {
   padding: 0px 0px 0px 0px;
-  font-size: 15px;
 }
 span.currenttag {
   padding: 0px 1px 0px 1px;
-  font-size: 15px;
 }
 span.currenttag:hover {
   cursor: default;
   padding: 0px 1px 0px 1px;
-  font-size: 15px;
 }
 .tooltip {
   position: relative;

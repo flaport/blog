@@ -1,34 +1,4 @@
 @font-face {
-  font-family: "Sans";
-  src: url("/static/fonts/LinBiolinum_Rah.ttf");
-  font-display: swap;
-}
-@font-face {
-  font-family: "SansBold";
-  src: url("/static/fonts/LinBiolinum_RBah.ttf");
-  font-display: swap;
-}
-@font-face {
-  font-family: "SansItalic";
-  src: url("/static/fonts/LinBiolinum_RIah.ttf");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Mono";
-  src: url("/static/fonts/FiraCode-Regular.ttf");
-  font-display: swap;
-}
-@font-face {
-  font-family: "MonoBold";
-  src: url("/static/fonts/FiraCode-SemiBold.ttf");
-  font-display: swap;
-}
-@font-face {
-  font-family: "MonoItalic";
-  src: url("/static/fonts/FiraCode-Light.ttf");
-  font-display: swap;
-}
-@font-face {
   font-family: "FontAwesome";
   src: url("/static/fonts/fontawesome-regular.ttf");
   font-display: swap;
@@ -38,38 +8,159 @@
   font-size: 0.9em;
 }
 
-/*
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: Sans;
+  font-family: Georgia, serif;
+}
+div.content h1 {
+  font-size: 240%;
+}
+div.content h2 {
+  font-size: 180%;
+}
+div.content h3 {
+  font-size: 150%;
+}
+div.content h4 {
+  font-size: 130%;
 }
 body,
 p {
-  font-family: Sans;
+  font-family: Georgia, serif;
   font-size: 1.1em;
   line-height: 1.1;
 }
 a {
   text-decoration: none;
 }
+a.tag {
+  font-size: 15px;
+}
+span.currenttag {
+  font-size: 15px;
+}
 b,
 strong {
-  font-family: SansBold;
-  font-weight: normal;
+  font-family: Georgia, serif;
+  font-weight: bold;
 }
 i {
-  font-family: SansItalic;
+  font-style: italic;
 }
 code,
 kbd,
 samp,
 pre {
-  font-family: Mono;
-  font-size: 0.8em;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 0.9em;
   line-height: 1.1;
 }
-*/
+.highlight .ge {
+  /* Generic.Emph */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-style: italic;
+}
+.highlight .gs {
+  /* Generic.Strong */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .gh {
+  /* Generic.Heading */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .gp {
+  /* Generic.Prompt */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .gu {
+  /* Generic.Subheading */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .ni {
+  /* Name.Entity */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .ow {
+  /* Operator.Word */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .k {
+  /* Keyword */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .kc {
+  /* Keyword.Constant */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .kd {
+  /* Keyword.Declaration */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .nc {
+  /* Name.Class */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .kn {
+  /* Keyword.Namespace */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .sd {
+  /* Literal.String.Doc */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .se {
+  /* Literal.String.Escape */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .si {
+  /* Literal.String.Interpol */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .c {
+  /* Comment */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .ch {
+  /* Comment.Hashbang */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .cm {
+  /* Comment.Multiline */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .cpf {
+  /* Comment.PreprocFile */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .c1 {
+  /* Comment.Single */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
+.highlight .cs {
+  /* Comment.Special */
+  font-family: "Lucida Console", Monaco, monospace;
+  font-weight: bold;
+}
