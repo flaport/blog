@@ -1,5 +1,4 @@
 # My notes on GPG and PGP
-
 _GPG_ stands for the 'GNU Privacy Guard'. It's the standard way to manage your _PGP_
 keys on Linux. _PGP_, in turn, stands for 'Pretty Good Privacy'. With _PGP_ you
 typically create a _public_/_private_ key pair which are respectively used to _encrypt_
