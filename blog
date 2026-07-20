@@ -33,7 +33,7 @@ import subprocess
 import http.server
 import socketserver
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from functools import partial, lru_cache
 from typing import Dict, Tuple, List, Callable, Optional
 from argparse import ArgumentParser, Namespace
@@ -171,7 +171,7 @@ class Post:
             assert utcoffset is not None
             return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
         except ValueError:
-            return datetime.utcnow()
+            return datetime.now(timezone.utc)
     @cache()
     def utcmodified(self) -> datetime:
         try:
@@ -182,7 +182,7 @@ class Post:
             assert utcoffset is not None
             return datetime.strptime((localdatetime-utcoffset).strftime("%Y%b%d%H%M%S"), "%Y%b%d%H%M%S")
         except ValueError:
-            return datetime.utcnow()
+            return datetime.now(timezone.utc)
     @cache()
     def summary(self) -> str:
         lines = []
@@ -488,7 +488,7 @@ class Index:
         self.posts = sorted(self.posts, key=lambda x: x.utcpublished(), reverse=True)
     def render(self, **kwargs) -> None:
         html = self._template.render(page=self, index=self, newest_post=self.posts[0], **kwargs)
-        xml = self._xmltemplate.render(page=self, index=self, date=datetime.utcnow(), **kwargs)
+        xml = self._xmltemplate.render(page=self, index=self, date=datetime.now(timezone.utc), **kwargs)
         sitemap = self._sitemaptemplate.render(pages=[self, *self.posts, *self.tags])
         bingverification = get_template(self._bingverification).render()
         googleverification = get_template(self._googleverification).render()
